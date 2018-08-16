@@ -8,6 +8,10 @@
     "compile": "tsc -p .",
     "pretest": "npm run compile"
   },
+  "files": [
+    "build/src",
+    "LICENSE"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fhinkel/teeny-request.git"
