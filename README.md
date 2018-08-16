@@ -38,3 +38,5 @@ The callback argument gets 3 arguments:
 
 
 
+## Thanks
+Special thanks to [billyjacobson](https://github.com/billyjacobson) for suggesting the name. Please report all bugs to them. 
