@@ -1,0 +1,35 @@
+{
+  "name": "teeny-request",
+  "version": "1.1.1",
+  "description": "Like request, but smaller.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha build/test",
+    "compile": "tsc -p .",
+    "pretest": "npm run compile"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fhinkel/teeny-request.git"
+  },
+  "keywords": [
+    "request",
+    "node-fetch",
+    "fetch"
+  ],
+  "author": "fhinkel",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/fhinkel/teeny-request/issues"
+  },
+  "homepage": "https://github.com/fhinkel/teeny-request#readme",
+  "dependencies": {
+    "node-fetch": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "^2.1.2",
+    "@types/request": "^2.47.1",
+    "mocha": "^5.2.0",
+    "typescript": "^3.0.1"
+  }
+}
