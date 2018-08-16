@@ -1,3 +1,5 @@
+'use strict';
+
 import * as r from 'request';
 import fetch from 'node-fetch';
 import * as f from 'node-fetch';

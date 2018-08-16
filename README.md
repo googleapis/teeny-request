@@ -4,14 +4,12 @@ Like `request`, but much smaller - and with less options. Uses `node-fetch` unde
 Pop it in where you would use `request`. Improves load and parse time of modules. 
 
 ```ts
-import * from 'teeny-request';
+import {teenyRequest as request} from 'teeny-request';
 
-const request = teenyRequest;
-
-request({uri: 'http://www.google.com'}, function (error, response, body) {
+request({uri: 'http://ip.jsontest.com/'}, function (error, response, body) {
   console.log('error:', error); // Print the error if one occurred
   console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-  console.log('body:', body); // Print the JSON for the Google homepage.
+  console.log('body:', body); // Print the JSON.
 });
 ```
 

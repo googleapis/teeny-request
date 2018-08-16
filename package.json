@@ -27,6 +27,7 @@
     "node-fetch": "^2.2.0"
   },
   "devDependencies": {
+    "@types/mocha": "^5.2.5",
     "@types/node-fetch": "^2.1.2",
     "@types/request": "^2.47.1",
     "mocha": "^5.2.0",
