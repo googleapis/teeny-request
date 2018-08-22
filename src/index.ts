@@ -3,7 +3,8 @@
 import * as r from 'request';
 import fetch from 'node-fetch';
 import * as f from 'node-fetch';
-
+// tslint:disable-next-line variable-name
+const HttpsProxyAgent = require('https-proxy-agent');
 
 function requestToFetchOptions(reqOpts: r.OptionsWithUri) {
 
@@ -11,8 +12,8 @@ function requestToFetchOptions(reqOpts: r.OptionsWithUri) {
     ...reqOpts.headers && { headers: reqOpts.headers },
     ...reqOpts.method && { method: reqOpts.method },
     ...reqOpts.json && { body: JSON.stringify(reqOpts.json) },
-    ...reqOpts.timeout && {timeout: reqOpts.timeout},
-    ...reqOpts.gzip && { compress: reqOpts.gzip},
+    ...reqOpts.timeout && { timeout: reqOpts.timeout },
+    ...reqOpts.gzip && { compress: reqOpts.gzip },
 
   };
 
@@ -21,6 +22,11 @@ function requestToFetchOptions(reqOpts: r.OptionsWithUri) {
     const qs = require('querystring');
     const params = qs.stringify(reqOpts.qs);
     uri = uri + '?' + params;
+  }
+
+  if (reqOpts.proxy || process.env.HTTP_PROXY || process.env.HTTPS_PROXY) {
+    const proxy = (process.env.HTTP_PROXY || process.env.HTTPS_PROXY)!;
+    options.agent = new HttpsProxyAgent(proxy);
   }
 
   return [uri, options];

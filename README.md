@@ -25,6 +25,7 @@ Options are limited to the following
 * useQuerystring
 * timeout in ms
 * gzip
+* proxy
 
 ```ts
 request({uri:'http://service.com/upload', method:'POST', json: {key:'value'}}, function(err,httpResponse,body){ /* ... */ })
@@ -51,6 +52,9 @@ let defaultRequest = teenyRequest.defaults({timeout: 60000});
             done();
         });
 ```        
+
+## Proxy environment variables
+If environment variables `HTTP_PROXY` or `HTTPS_PROXY` are set, they are respected. `NO_PROXY` is currently not implemented.
 
 ## Thanks
 Special thanks to [billyjacobson](https://github.com/billyjacobson) for suggesting the name. Please report all bugs to them. 

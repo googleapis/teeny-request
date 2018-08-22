@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/fhinkel/teeny-request#readme",
   "dependencies": {
+    "https-proxy-agent": "^2.2.1",
     "node-fetch": "^2.2.0"
   },
   "devDependencies": {
