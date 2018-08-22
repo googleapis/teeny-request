@@ -23,6 +23,8 @@ Options are limited to the following
 * json
 * qs
 * useQuerystring
+* timeout in ms
+* gzip
 
 ```ts
 request({uri:'http://service.com/upload', method:'POST', json: {key:'value'}}, function(err,httpResponse,body){ /* ... */ })
@@ -34,7 +36,21 @@ The callback argument gets 3 arguments:
  * An response object with statusCode, a statusMessage, and a body
  * The third is the response body (JSON object)
 
+## defaults(options)
 
+Set default options for every `teenyRequest` call.
+
+```ts
+let defaultRequest = teenyRequest.defaults({timeout: 60000});
+      defaultRequest({uri: 'http://ip.jsontest.com/'}, function (error, response, body) {
+            assert.ifError(error);
+            assert.strictEqual(response.statusCode, 200);
+            console.log(body.ip);
+            assert.notEqual(body.ip, null);
+            
+            done();
+        });
+```        
 
 ## Thanks
 Special thanks to [billyjacobson](https://github.com/billyjacobson) for suggesting the name. Please report all bugs to them. 

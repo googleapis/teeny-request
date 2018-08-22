@@ -6,10 +6,14 @@ import * as f from 'node-fetch';
 
 
 function requestToFetchOptions(reqOpts: r.OptionsWithUri) {
+
   const options: f.RequestInit = {
     ...reqOpts.headers && { headers: reqOpts.headers },
     ...reqOpts.method && { method: reqOpts.method },
     ...reqOpts.json && { body: JSON.stringify(reqOpts.json) },
+    ...reqOpts.timeout && {timeout: reqOpts.timeout},
+    ...reqOpts.gzip && { compress: reqOpts.gzip},
+
   };
 
   let uri: string = reqOpts.uri as string;
@@ -32,14 +36,6 @@ function fetchToRequestResponse(res: f.Response) {
 
 
 function teenyRequest(reqOpts: r.OptionsWithUri, callback: any) {
-  reqOpts.timeout = reqOpts.timeout || 60000;
-  reqOpts.gzip = reqOpts.gzip || true;
-  reqOpts.forever = reqOpts.forever || true;
-  if (!reqOpts.pool) {
-    reqOpts.pool = {};
-  }
-  reqOpts.pool.maxSockets = reqOpts.pool.maxSockets || Infinity;
-
   const [uri, options] = requestToFetchOptions(reqOpts);
 
   fetch(uri as string, options as f.RequestInit)
@@ -56,6 +52,15 @@ function teenyRequest(reqOpts: r.OptionsWithUri, callback: any) {
         callback(err);
       });
     });
+}
+
+namespace teenyRequest {
+  export function defaults(defaults: r.OptionsWithUri) {
+    return function (reqOpts: r.OptionsWithUri, callback: any) {
+      teenyRequest({ ...defaults, ...reqOpts }, callback);
+
+    };
+  }
 }
 
 export { teenyRequest };
