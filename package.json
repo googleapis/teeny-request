@@ -1,6 +1,6 @@
 {
   "name": "teeny-request",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Like request, but smaller.",
   "main": "./build/src/index.js",
   "scripts": {
