@@ -11,7 +11,7 @@ function requestToFetchOptions(reqOpts: r.OptionsWithUri) {
   const options: f.RequestInit = {
     ...reqOpts.headers && { headers: reqOpts.headers },
     ...reqOpts.method && { method: reqOpts.method },
-    ...reqOpts.json && { body: JSON.stringify(reqOpts.json) },
+    ...reqOpts.json && { body: JSON.stringify(reqOpts.body) },
     ...reqOpts.timeout && { timeout: reqOpts.timeout },
     ...reqOpts.gzip && { compress: reqOpts.gzip },
 
@@ -40,23 +40,36 @@ function fetchToRequestResponse(res: f.Response) {
   return response;
 }
 
-
-function teenyRequest(reqOpts: r.OptionsWithUri, callback: any) {
+function teenyRequest(reqOpts: r.OptionsWithUri, callback?: any) {
   const [uri, options] = requestToFetchOptions(reqOpts);
-
   fetch(uri as string, options as f.RequestInit)
     .then((res: f.Response) => {
       if (!res.ok) {
         callback(new Error(`${res.status}: ${res.statusText}`));
         return;
       }
-      res.json().then(json => {
+      let header = res.headers.get('content-type');
+      if(header === 'application/json') {
         let response = fetchToRequestResponse(res);
-        response.body = json;
-        callback(null, response, json);
-      }).catch((err) => {
+        res.json().then(json => {
+          response.body = json;
+          callback(null, response, json);
+        }).catch(err =>{
+          callback(err);
+        });
+        return;
+      }
+
+      res.text().then(text => {
+        let response = fetchToRequestResponse(res);
+          response.body = text;
+          callback(null, response, text);
+
+      }).catch(err => {
         callback(err);
-      });
+      })
+    }).catch(err => {
+      callback(err);
     });
 }
 
