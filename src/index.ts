@@ -49,12 +49,12 @@ function teenyRequest(reqOpts: r.OptionsWithUri, callback?: any) {
         return;
       }
       let header = res.headers.get('content-type');
-      if(header === 'application/json' || header === 'application/json; charset=utf-8') {
+      if (header === 'application/json' || header === 'application/json; charset=utf-8') {
         let response = fetchToRequestResponse(res);
         res.json().then(json => {
           response.body = json;
           callback(null, response, json);
-        }).catch(err =>{
+        }).catch(err => {
           callback(err);
         });
         return;
@@ -62,8 +62,8 @@ function teenyRequest(reqOpts: r.OptionsWithUri, callback?: any) {
 
       res.text().then(text => {
         let response = fetchToRequestResponse(res);
-          response.body = text;
-          callback(null, response, text);
+        response.body = text;
+        callback(null, response, text);
 
       }).catch(err => {
         callback(err);
