@@ -17,11 +17,11 @@ describe('teeny', () => {
   }),
     it('should set defaults', (done) => {
       let defaultRequest = teenyRequest.defaults({ timeout: 60000 } as any);
-      defaultRequest({ uri: 'http://ip.jsontest.com/' }, function (error: any, response: any, body: any) {
+      defaultRequest({ uri: 'https://jsonplaceholder.typicode.com/todos/1' }, function (error: any, response: any, body: any) {
         assert.ifError(error);
         assert.strictEqual(response.statusCode, 200);
         console.log(body.ip);
-        assert.notEqual(body.ip, null);
+        assert.notEqual(body.userId, null);
 
         done();
       });

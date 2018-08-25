@@ -49,7 +49,7 @@ function teenyRequest(reqOpts: r.OptionsWithUri, callback?: any) {
         return;
       }
       let header = res.headers.get('content-type');
-      if(header === 'application/json') {
+      if(header === 'application/json' || header === 'application/json; charset=utf-8') {
         let response = fetchToRequestResponse(res);
         res.json().then(json => {
           response.body = json;
