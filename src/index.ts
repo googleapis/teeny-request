@@ -13,13 +13,26 @@ interface RequestToFetchOptions {
 const requestToFetchOptions: RequestToFetchOptions =
     (reqOpts: r.OptionsWithUri) => {
       const options: f.RequestInit = {
-        ...reqOpts.headers && {headers: reqOpts.headers},
         ...reqOpts.method && {method: reqOpts.method},
-        ...reqOpts.json && {body: JSON.stringify(reqOpts.body)},
         ...reqOpts.timeout && {timeout: reqOpts.timeout},
         ...reqOpts.gzip && {compress: reqOpts.gzip},
 
       };
+
+      if (typeof reqOpts.json === 'object') {
+        // Add Content-type: application/json header
+        if (!reqOpts.headers) {
+          reqOpts.headers = {};
+        }
+        reqOpts.headers['Content-Type'] = 'application/json';
+
+        // Set body to JSON representation of value
+        options.body = JSON.stringify(reqOpts.json);
+      } else {
+        options.body = JSON.stringify(reqOpts.body);
+      }
+
+      options.headers = reqOpts.headers;
 
       let uri: string = reqOpts.uri as string;
       if (reqOpts.useQuerystring === true) {
