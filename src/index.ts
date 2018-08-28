@@ -74,44 +74,39 @@ interface TeenyRequest {
            ((reqOpts: r.OptionsWithUri, callback: Callback) => void));
 }
 
-const teenyRequest =
-    ((reqOpts: r.OptionsWithUri, callback: Callback) => {
-      const [uri, options] = requestToFetchOptions(reqOpts);
-      fetch(uri as string, options as f.RequestInit)
-          .then((res: f.Response) => {
-            if (!res.ok) {
-              callback(new Error(`${res.status}: ${res.statusText}`));
-              return;
-            }
-            const header = res.headers.get('content-type');
-            if (header === 'application/json' ||
-                header === 'application/json; charset=utf-8') {
-              const response = fetchToRequestResponse(res);
-              res.json()
-                  .then(json => {
-                    response.body = json;
-                    callback(null, response, json);
-                  })
-                  .catch((err: Error) => {
-                    callback(err);
-                  });
-              return;
-            }
+const teenyRequest = ((reqOpts: r.OptionsWithUri, callback: Callback) => {
+                       const [uri, options] = requestToFetchOptions(reqOpts);
+                       fetch(uri as string, options as f.RequestInit)
+                           .then((res: f.Response) => {
+                             const header = res.headers.get('content-type');
+                             if (header === 'application/json' ||
+                                 header === 'application/json; charset=utf-8') {
+                               const response = fetchToRequestResponse(res);
+                               res.json()
+                                   .then(json => {
+                                     response.body = json;
+                                     callback(null, response, json);
+                                   })
+                                   .catch((err: Error) => {
+                                     callback(err);
+                                   });
+                               return;
+                             }
 
-            res.text()
-                .then(text => {
-                  const response = fetchToRequestResponse(res);
-                  response.body = text;
-                  callback(null, response, text);
-                })
-                .catch(err => {
-                  callback(err);
-                });
-          })
-          .catch((err: Error) => {
-            callback(err);
-          });
-    }) as TeenyRequest;
+                             res.text()
+                                 .then(text => {
+                                   const response = fetchToRequestResponse(res);
+                                   response.body = text;
+                                   callback(null, response, text);
+                                 })
+                                 .catch(err => {
+                                   callback(err);
+                                 });
+                           })
+                           .catch((err: Error) => {
+                             callback(err);
+                           });
+                     }) as TeenyRequest;
 
 teenyRequest.defaults = (defaults: r.OptionsWithUri) => {
   return (reqOpts: r.OptionsWithUri,
