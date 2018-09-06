@@ -3,8 +3,8 @@
 Like `request`, but much smaller - and with less options. Uses `node-fetch` under the hood. 
 Pop it in where you would use `request`. Improves load and parse time of modules. 
 
-```ts
-import {teenyRequest as request} from 'teeny-request';
+```js
+const request = require('teeny-request').teenyRequest;
 
 request({uri: 'http://ip.jsontest.com/'}, function (error, response, body) {
   console.log('error:', error); // Print the error if one occurred
@@ -12,6 +12,21 @@ request({uri: 'http://ip.jsontest.com/'}, function (error, response, body) {
   console.log('body:', body); // Print the JSON.
 });
 ```
+
+For TypeScript, you can use `@types/request`. 
+
+```ts
+import {teenyRequest as request} from 'teeny-request';
+import r as * from 'request'; // Only for type declarations
+
+request({uri: 'http://ip.jsontest.com/'}, (error: any, response: r.Response, body: any) => {
+  console.log('error:', error); // Print the error if one occurred
+  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+  console.log('body:', body); // Print the JSON.
+});
+```
+
+
 
 ## teenyRequest(options, callback)
 
@@ -56,5 +71,13 @@ let defaultRequest = teenyRequest.defaults({timeout: 60000});
 ## Proxy environment variables
 If environment variables `HTTP_PROXY` or `HTTPS_PROXY` are set, they are respected. `NO_PROXY` is currently not implemented.
 
+## Motivation
+`request` has a ton of options and features and is accordingly large. Requiering a module incurs load and parse time. For
+`request`, that is around 600ms.
+
+![Load time of request measured with require-so-slow](https://user-images.githubusercontent.com/101553/44694187-20357700-aa3a-11e8-9116-b8ae794cbc27.png)
+
+`teeny-request` doesn't have any of the bells and whistles that `request` has, but is so much faster to load. If startup time is an issue and you don't need much beyong a basic GET and POST, you can use `teeny-request`.
+
 ## Thanks
-Special thanks to [billyjacobson](https://github.com/billyjacobson) for suggesting the name. Please report all bugs to them. 
+Special thanks to [billyjacobson](https://github.com/billyjacobson) for suggesting the name. Please report all bugs to them. Just kidding. Please open issues.
