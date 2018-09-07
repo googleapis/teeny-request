@@ -71,6 +71,16 @@ let defaultRequest = teenyRequest.defaults({timeout: 60000});
 ## Proxy environment variables
 If environment variables `HTTP_PROXY` or `HTTPS_PROXY` are set, they are respected. `NO_PROXY` is currently not implemented.
 
+## Building with Webpack 4+
+Since 4.0.0, Webpack uses `javascript/esm` for `.mjs` files which handles ESM more strictly compared to `javascript/auto`. If you get the error `Can't import the named export 'PassThrough' from non EcmaScript module`, please add the following to your Webpack config:
+
+```js
+{
+    test: /\.mjs$/,
+    type: 'javascript/auto',
+},
+```
+
 ## Motivation
 `request` has a ton of options and features and is accordingly large. Requiering a module incurs load and parse time. For
 `request`, that is around 600ms.
