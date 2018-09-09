@@ -35,7 +35,7 @@ const requestToFetchOptions: RequestToFetchOptions =
       options.headers = reqOpts.headers;
 
       let uri: string = reqOpts.uri as string;
-      if (reqOpts.useQuerystring === true) {
+      if (reqOpts.useQuerystring === true || typeof reqOpts.qs === 'object') {
         const qs = require('querystring');
         const params = qs.stringify(reqOpts.qs);
         uri = uri + '?' + params;
