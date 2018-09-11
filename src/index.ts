@@ -29,7 +29,9 @@ const requestToFetchOptions: RequestToFetchOptions =
         // Set body to JSON representation of value
         options.body = JSON.stringify(reqOpts.json);
       } else {
-        options.body = JSON.stringify(reqOpts.body);
+        if (typeof reqOpts.body !== 'string') {
+          options.body = JSON.stringify(reqOpts.body);
+        }
       }
 
       options.headers = reqOpts.headers;
