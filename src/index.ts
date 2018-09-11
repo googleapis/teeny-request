@@ -116,12 +116,19 @@ const teenyRequest = ((reqOpts: r.OptionsWithUri, callback?: Callback) => {
       if (header === 'application/json' ||
         header === 'application/json; charset=utf-8') {
         const response = fetchToRequestResponse(res);
+        if (response.statusCode === 204) {
+          // Probably a DELETE
+          callback!(null, response, response);
+          return;
+        }
         res.json()
           .then(json => {
             response.body = json;
             callback!(null, response, json);
           })
           .catch((err: Error) => {
+            let myR = reqOpts;
+            let myF = options;
             callback!(err);
           });
         return;
