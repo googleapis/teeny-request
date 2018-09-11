@@ -81,22 +81,22 @@ const teenyRequest = ((reqOpts: r.OptionsWithUri, callback?: Callback) => {
   if (callback === undefined) {
     // Stream mode
     const requestStream: PassThrough = new PassThrough();
-    // const dest = fs.createWriteStream('./octocat.png');
+    const dest = require('fs').createWriteStream('./octocat.png');
     fetch(uri as string, options as f.RequestInit)
       .then((res: f.Response) => {
 
         return new Promise((resolve, reject) => {
-          res.body.pipe(requestStream);
+          res.body.pipe(dest);
           res.body.on('error', err => {
             console.log('err');
 
             reject(err);
           });
-          requestStream.on('finish', () => {
+          dest.on('finish', () => {
             console.log('done');
             resolve();
           });
-          requestStream.on('error', err => {
+          dest.on('error', (err: Error) => {
             console.log('err');
             reject(err);
           });
