@@ -2,9 +2,12 @@
 
 import * as r from 'request';
 import fetch, * as f from 'node-fetch';
-import { PassThrough } from 'stream';
+import { PassThrough, Readable } from 'stream';
 // tslint:disable-next-line variable-name
 const HttpsProxyAgent = require('https-proxy-agent');
+// tslint:disable-next-line variable-name
+var through = require('through2');
+
 
 
 interface RequestToFetchOptions {
@@ -81,19 +84,30 @@ const teenyRequest = ((reqOpts: r.OptionsWithUri, callback?: Callback) => {
   if (callback === undefined) {
     // Stream mode
 
-    // let delayStream = through({ objectMode: false });
+    // let requestStream = through({ objectMode: false });
     const requestStream: PassThrough = new PassThrough();
     fetch(uri as string, options as f.RequestInit)
       .then((res: f.Response) => {
-        res.body.pipe(requestStream);
+        // const isCompressed = headers['content-encoding'] === 'gzip';
+        const encoding = res.headers.get('content-type');
+        console.log(encoding);
+        // res.body.pipe(requestStream);
         res.body.on('error', err => {
          console.log('whoa' + err);
         });
+
+        // let readable = new Readable();
+        // res.body.pipe(readable);
+        
+        requestStream.emit('response', res.body);
+        
       })
       .catch((err: Error) => {
         callback!(err);
       });
 
+    // fetch doesn't supply the raw HTTP stream, instead it returns a 
+    // PassThrough piped from the HTTP response stream
     return requestStream;
   }
   fetch(uri as string, options as f.RequestInit)
