@@ -79,8 +79,60 @@ interface TeenyRequest {
 const teenyRequest = ((reqOpts: r.OptionsWithUri, callback?: Callback) => {
                        const [uri, options] = requestToFetchOptions(reqOpts);
 
+                       let multipart: Array<any> = (reqOpts.multipart as Array<any>);
+                       if(reqOpts.multipart && multipart.length === 2) {
+                         console.log("whoop");
+                         (options.headers as any)['Content-Type'] = JSON.parse(
+                           (multipart[0] as {body: string}).body).contentType;
+                         
+                           console.log((options.headers as any)['Content-Type']);
+
+                           let stream = multipart[1].body;  // Transform
+                           options.body = stream;
+
+
+                         fetch(uri as string, options as f.RequestInit)
+                           .then((res: f.Response) => {
+                             const header = res.headers.get('content-type');
+                             if (header === 'application/json' ||
+                                 header === 'application/json; charset=utf-8') {
+                               const response = fetchToRequestResponse(res);
+                               if (response.statusCode === 204) {
+                                 // Probably a DELETE
+                                 callback!(null, response, response);
+                                 return;
+                               }
+                               res.json()
+                                   .then(json => {
+                                     response.body = json;
+                                     callback!(null, response, json);
+                                   })
+                                   .catch((err: Error) => {
+                                     callback!(err);
+                                   });
+                               return;
+                             }
+
+                             res.text()
+                                 .then(text => {
+                                   const response = fetchToRequestResponse(res);
+                                   response.body = text;
+                                   callback!(null, response, text);
+                                 })
+                                 .catch(err => {
+                                   callback!(err);
+                                 });
+                           })
+                           .catch((err: Error) => {
+                             callback!(err);
+                           });
+                       return;
+
+                       }
+
                        if (callback === undefined) {
                          // Stream mode
+                         console.log("foo bar");
 
                          // let requestStream = through({ objectMode: false });
                          const requestStream: PassThrough = new PassThrough();
@@ -90,15 +142,11 @@ const teenyRequest = ((reqOpts: r.OptionsWithUri, callback?: Callback) => {
                                // headers['content-encoding'] === 'gzip';
                                const encoding = res.headers.get('content-type');
                                console.log(encoding);
-                               // res.body.pipe(requestStream);
                                res.body.on('error', err => {
                                  console.log('whoa' + err);
                                });
 
-                               // let readable = new Readable();
-                               // res.body.pipe(readable);
-
-                               requestStream.emit('response', res.body);
+                              //  requestStream.emit('response', res.body);
                              })
                              .catch((err: Error) => {
                                callback!(err);
