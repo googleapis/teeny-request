@@ -81,7 +81,6 @@ const teenyRequest = ((reqOpts: r.OptionsWithUri, callback?: Callback) => {
 
                        let multipart: Array<any> = (reqOpts.multipart as Array<any>);
                        if(reqOpts.multipart && multipart.length === 2) {
-                         console.log("whoop");
                          (options.headers as any)['Content-Type'] = JSON.parse(
                            (multipart[0] as {body: string}).body).contentType;
                          
@@ -132,7 +131,6 @@ const teenyRequest = ((reqOpts: r.OptionsWithUri, callback?: Callback) => {
 
                        if (callback === undefined) {
                          // Stream mode
-                         console.log("foo bar");
 
                          // let requestStream = through({ objectMode: false });
                          const requestStream: PassThrough = new PassThrough();
