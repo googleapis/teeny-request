@@ -146,7 +146,7 @@ const teenyRequest = ((reqOpts: r.OptionsWithUri, callback?: Callback) => {
                                  console.log('whoa' + err);
                                });
 
-                              //  requestStream.emit('response', res.body);
+                               requestStream.emit('response', res.body);
                              })
                              .catch((err: Error) => {
                                callback!(err);
