@@ -143,12 +143,21 @@ const teenyRequest =
         const requestStream: PassThrough = new PassThrough();
         fetch(uri as string, options as f.RequestInit)
             .then((res: f.Response) => {
+              if (!res.ok) {
+                // tslint:disable-next-line:no-any
+                const error: any = new Error(res.statusText);
+                error.code = res.status;
+                requestStream.emit('error', error);
+                return;
+              }
+
               // const isCompressed =
               // headers['content-encoding'] === 'gzip';
               const encoding = res.headers.get('content-type');
               console.log(encoding);
               res.body.on('error', err => {
-                console.log('whoa' + err);
+                console.log('whoa there was an error, passing it on' + err);
+                requestStream.emit('error', err);
               });
 
               requestStream.emit('response', res.body);
@@ -162,6 +171,7 @@ const teenyRequest =
         // stream
         return requestStream;
       }
+      // regular fetch
       fetch(uri as string, options as f.RequestInit)
           .then((res: f.Response) => {
             const header = res.headers.get('content-type');
