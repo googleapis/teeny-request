@@ -15,7 +15,7 @@ interface RequestToFetchOptions {
 const requestToFetchOptions: RequestToFetchOptions =
     (reqOpts: r.OptionsWithUri) => {
       const options: f.RequestInit = {
-        ...reqOpts.method && {method: reqOpts.method},
+        method: reqOpts.method || 'GET',
         ...reqOpts.timeout && {timeout: reqOpts.timeout},
         ...reqOpts.gzip && {compress: reqOpts.gzip},
 
@@ -97,7 +97,7 @@ const teenyRequest =
         const stream = multipart[1].body;  // Transform
         options.body = stream;
 
-
+        // Multipart
         fetch(uri as string, options as f.RequestInit)
             .then((res: f.Response) => {
               const header = res.headers.get('content-type');
@@ -136,10 +136,7 @@ const teenyRequest =
         return;
       }
 
-      if (callback === undefined) {
-        // Stream mode
-
-        // let requestStream = through({ objectMode: false });
+      if (callback === undefined) {  // Stream mode
         const requestStream: PassThrough = new PassThrough();
         fetch(uri as string, options as f.RequestInit)
             .then((res: f.Response) => {
@@ -154,7 +151,6 @@ const teenyRequest =
               // const isCompressed =
               // headers['content-encoding'] === 'gzip';
               const encoding = res.headers.get('content-type');
-              console.log(encoding);
               res.body.on('error', err => {
                 console.log('whoa there was an error, passing it on' + err);
                 requestStream.emit('error', err);
