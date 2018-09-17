@@ -76,122 +76,129 @@ interface TeenyRequest {
            ((reqOpts: r.OptionsWithUri, callback: Callback) => void));
 }
 
-const teenyRequest = ((reqOpts: r.OptionsWithUri, callback?: Callback) => {
-                       const [uri, options] = requestToFetchOptions(reqOpts);
+const teenyRequest =
+    ((reqOpts: r.OptionsWithUri, callback?: Callback) => {
+      const [uri, options] = requestToFetchOptions(reqOpts);
 
-                       let multipart: Array<any> = (reqOpts.multipart as Array<any>);
-                       if(reqOpts.multipart && multipart.length === 2) {
-                         (options.headers as any)['Content-Type'] = JSON.parse(
-                           (multipart[0] as {body: string}).body).contentType;
-                         
-                           console.log((options.headers as any)['Content-Type']);
+      // tslint:disable-next-line:no-any
+      const multipart: any[] = (reqOpts.multipart as any[]);
+      if (reqOpts.multipart && multipart.length === 2) {
+        // tslint:disable-next-line:no-any
+        (options.headers as any)['Content-Type'] =
+            JSON.parse((multipart[0] as {body: string}).body).contentType;
 
-                           let stream = multipart[1].body;  // Transform
-                           options.body = stream;
+        // tslint:disable-next-line:no-any
+        if ((options.headers as any)['Content-Type'] === undefined) {
+          // tslint:disable-next-line:no-any
+          (options.headers as any)['Content-Type'] =
+              (multipart[1] as {'Content-Type': string})['Content-Type'];
+        }
+
+        const stream = multipart[1].body;  // Transform
+        options.body = stream;
 
 
-                         fetch(uri as string, options as f.RequestInit)
-                           .then((res: f.Response) => {
-                             const header = res.headers.get('content-type');
-                             if (header === 'application/json' ||
-                                 header === 'application/json; charset=utf-8') {
-                               const response = fetchToRequestResponse(res);
-                               if (response.statusCode === 204) {
-                                 // Probably a DELETE
-                                 callback!(null, response, response);
-                                 return;
-                               }
-                               res.json()
-                                   .then(json => {
-                                     response.body = json;
-                                     callback!(null, response, json);
-                                   })
-                                   .catch((err: Error) => {
-                                     callback!(err);
-                                   });
-                               return;
-                             }
+        fetch(uri as string, options as f.RequestInit)
+            .then((res: f.Response) => {
+              const header = res.headers.get('content-type');
+              if (header === 'application/json' ||
+                  header === 'application/json; charset=utf-8') {
+                const response = fetchToRequestResponse(res);
+                if (response.statusCode === 204) {
+                  // Probably a DELETE
+                  callback!(null, response, response);
+                  return;
+                }
+                res.json()
+                    .then(json => {
+                      response.body = json;
+                      callback!(null, response, json);
+                    })
+                    .catch((err: Error) => {
+                      callback!(err);
+                    });
+                return;
+              }
 
-                             res.text()
-                                 .then(text => {
-                                   const response = fetchToRequestResponse(res);
-                                   response.body = text;
-                                   callback!(null, response, text);
-                                 })
-                                 .catch(err => {
-                                   callback!(err);
-                                 });
-                           })
-                           .catch((err: Error) => {
-                             callback!(err);
-                           });
-                       return;
+              res.text()
+                  .then(text => {
+                    const response = fetchToRequestResponse(res);
+                    response.body = text;
+                    callback!(null, response, text);
+                  })
+                  .catch(err => {
+                    callback!(err);
+                  });
+            })
+            .catch((err: Error) => {
+              callback!(err);
+            });
+        return;
+      }
 
-                       }
+      if (callback === undefined) {
+        // Stream mode
 
-                       if (callback === undefined) {
-                         // Stream mode
+        // let requestStream = through({ objectMode: false });
+        const requestStream: PassThrough = new PassThrough();
+        fetch(uri as string, options as f.RequestInit)
+            .then((res: f.Response) => {
+              // const isCompressed =
+              // headers['content-encoding'] === 'gzip';
+              const encoding = res.headers.get('content-type');
+              console.log(encoding);
+              res.body.on('error', err => {
+                console.log('whoa' + err);
+              });
 
-                         // let requestStream = through({ objectMode: false });
-                         const requestStream: PassThrough = new PassThrough();
-                         fetch(uri as string, options as f.RequestInit)
-                             .then((res: f.Response) => {
-                               // const isCompressed =
-                               // headers['content-encoding'] === 'gzip';
-                               const encoding = res.headers.get('content-type');
-                               console.log(encoding);
-                               res.body.on('error', err => {
-                                 console.log('whoa' + err);
-                               });
+              requestStream.emit('response', res.body);
+            })
+            .catch((err: Error) => {
+              callback!(err);
+            });
 
-                               requestStream.emit('response', res.body);
-                             })
-                             .catch((err: Error) => {
-                               callback!(err);
-                             });
+        // fetch doesn't supply the raw HTTP stream, instead it
+        // returns a PassThrough piped from the HTTP response
+        // stream
+        return requestStream;
+      }
+      fetch(uri as string, options as f.RequestInit)
+          .then((res: f.Response) => {
+            const header = res.headers.get('content-type');
+            if (header === 'application/json' ||
+                header === 'application/json; charset=utf-8') {
+              const response = fetchToRequestResponse(res);
+              if (response.statusCode === 204) {
+                // Probably a DELETE
+                callback!(null, response, response);
+                return;
+              }
+              res.json()
+                  .then(json => {
+                    response.body = json;
+                    callback!(null, response, json);
+                  })
+                  .catch((err: Error) => {
+                    callback!(err);
+                  });
+              return;
+            }
 
-                         // fetch doesn't supply the raw HTTP stream, instead it
-                         // returns a PassThrough piped from the HTTP response
-                         // stream
-                         return requestStream;
-                       }
-                       fetch(uri as string, options as f.RequestInit)
-                           .then((res: f.Response) => {
-                             const header = res.headers.get('content-type');
-                             if (header === 'application/json' ||
-                                 header === 'application/json; charset=utf-8') {
-                               const response = fetchToRequestResponse(res);
-                               if (response.statusCode === 204) {
-                                 // Probably a DELETE
-                                 callback!(null, response, response);
-                                 return;
-                               }
-                               res.json()
-                                   .then(json => {
-                                     response.body = json;
-                                     callback!(null, response, json);
-                                   })
-                                   .catch((err: Error) => {
-                                     callback!(err);
-                                   });
-                               return;
-                             }
-
-                             res.text()
-                                 .then(text => {
-                                   const response = fetchToRequestResponse(res);
-                                   response.body = text;
-                                   callback!(null, response, text);
-                                 })
-                                 .catch(err => {
-                                   callback!(err);
-                                 });
-                           })
-                           .catch((err: Error) => {
-                             callback!(err);
-                           });
-                       return;
-                     }) as TeenyRequest;
+            res.text()
+                .then(text => {
+                  const response = fetchToRequestResponse(res);
+                  response.body = text;
+                  callback!(null, response, text);
+                })
+                .catch(err => {
+                  callback!(err);
+                });
+          })
+          .catch((err: Error) => {
+            callback!(err);
+          });
+      return;
+    }) as TeenyRequest;
 
 teenyRequest.defaults = (defaults: r.OptionsWithUri) => {
   return (reqOpts: r.OptionsWithUri,
