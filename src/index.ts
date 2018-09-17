@@ -148,18 +148,24 @@ const teenyRequest =
                 return;
               }
 
-              // const isCompressed =
-              // headers['content-encoding'] === 'gzip';
               const encoding = res.headers.get('content-type');
               res.body.on('error', err => {
                 console.log('whoa there was an error, passing it on' + err);
                 requestStream.emit('error', err);
               });
 
+              // tslint:disable-next-line:no-any
+              (res.body as any).toJSON = () => {
+                const headers:
+                    {'content-encoding': string} = {'content-encoding': 'gzip'};
+                return {headers};
+              };
+
               requestStream.emit('response', res.body);
             })
             .catch((err: Error) => {
-              callback!(err);
+              console.log('such a nice error:' + err);
+              requestStream.emit('error', err);
             });
 
         // fetch doesn't supply the raw HTTP stream, instead it
