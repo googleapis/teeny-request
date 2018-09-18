@@ -31,6 +31,8 @@ const requestToFetchOptions: RequestToFetchOptions =
       } else {
         if (typeof reqOpts.body !== 'string') {
           options.body = JSON.stringify(reqOpts.body);
+        } else {
+          options.body = reqOpts.body;
         }
       }
 
