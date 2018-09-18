@@ -86,9 +86,6 @@ const teenyRequest =
 
       const boundary = 'someRandomBoundaryString';
       const finale = `--${boundary}--`;
-      const multiHeaders: { 'Content-Type': string } = {
-        'Content-Type': `multipart/related; boundary=${boundary}`
-      };
       const mediaStream: PassThrough = new PassThrough();
 
       for (const part of multipart) {
@@ -99,11 +96,6 @@ const teenyRequest =
           mediaStream.push(part.body);
           mediaStream.push('\r\n');
         } else {
-
-          // var zlib = require('zlib');
-          // var gzip = zlib.createGzip();
-          // part.body.pipe(gzip).pipe(mediaStream, { end: false });
-
           part.body.pipe(mediaStream, { end: false });
           part.body.on('end', () => {
             mediaStream.push('\r\n');
@@ -112,11 +104,10 @@ const teenyRequest =
           });
         }
       }
-      (options.headers as any)['Content-Type'] = multiHeaders['Content-Type'];
-      options.compress = false;
+      (options.headers as any)['Content-Type'] = `multipart/related; boundary=${boundary}`;
       options.body = mediaStream;
 
-      // Multipart
+      // Multipart upload
       fetch(uri as string, options as f.RequestInit)
         .then((res: f.Response) => {
           const header = res.headers.get('content-type');
@@ -157,6 +148,7 @@ const teenyRequest =
 
     if (callback === undefined) {  // Stream mode
       const requestStream: PassThrough = new PassThrough();
+      options.compress = false;
       fetch(uri as string, options as f.RequestInit)
         .then((res: f.Response) => {
           if (!res.ok) {
@@ -167,7 +159,7 @@ const teenyRequest =
             return;
           }
 
-          const encoding = res.headers.get('content-type');
+          const encoding = res.headers.get('content-encoding');
           res.body.on('error', err => {
             console.log('whoa there was an error, passing it on' + err);
             requestStream.emit('error', err);
@@ -175,8 +167,10 @@ const teenyRequest =
 
           // tslint:disable-next-line:no-any
           (res.body as any).toJSON = () => {
-            const headers:
-              { 'content-encoding': string } = { 'content-encoding': 'gzip' };
+            const headers: any
+               = { 
+                ...encoding && {'content-encoding': encoding} 
+              };
             return { headers };
           };
 
