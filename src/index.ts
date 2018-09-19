@@ -6,10 +6,16 @@ import {PassThrough} from 'stream';
 // tslint:disable-next-line variable-name
 const HttpsProxyAgent = require('https-proxy-agent');
 
-
-
 interface RequestToFetchOptions {
   (reqOpts: r.OptionsWithUri): [string, f.RequestInit];
+}
+
+interface Headers {
+  [index: string]: string;
+}
+
+interface FetchToRequestResponse {
+  (res: f.Response): r.Response;
 }
 
 const requestToFetchOptions: RequestToFetchOptions =
@@ -55,9 +61,10 @@ const requestToFetchOptions: RequestToFetchOptions =
       return [uri, options];
     };
 
-interface FetchToRequestResponse {
-  (res: f.Response): r.Response;
+interface Callback {
+  (err: Error|null, response?: r.Response, body?: {}|string): void;
 }
+
 const fetchToRequestResponse: FetchToRequestResponse = (res: f.Response) => {
   const response: r.Response = {
     statusCode: res.status,
@@ -65,11 +72,6 @@ const fetchToRequestResponse: FetchToRequestResponse = (res: f.Response) => {
   } as r.Response;
   return response;
 };
-
-
-interface Callback {
-  (err: Error|null, response?: r.Response, body?: {}|string): void;
-}
 
 // Mimics `request`. Can be used as `request(options, callback)`
 // or `request.defaults(opts)(options, callback)`
@@ -80,9 +82,30 @@ interface TeenyRequest {
            ((reqOpts: r.OptionsWithUri, callback: Callback) => void));
 }
 
-interface Headers {
-  [index: string]: string;
-}
+// create POST body from two parts as multipart/related content-type
+const createMultipartStream =
+    (boundary: string, multipart: r.RequestPart[]) => {
+      const finale = `--${boundary}--`;
+      const stream: PassThrough = new PassThrough();
+
+      for (const part of multipart) {
+        const preamble = `--${boundary}\r\nContent-Type: ${
+            (part as {['Content-Type']?: string})['Content-Type']}\r\n\r\n`;
+        stream.push(preamble);
+        if (typeof part.body === 'string') {
+          stream.push(part.body);
+          stream.push('\r\n');
+        } else {
+          part.body.pipe(stream, {end: false});
+          part.body.on('end', () => {
+            stream.push('\r\n');
+            stream.push(finale);
+            stream.push(null);
+          });
+        }
+      }
+      return stream;
+    };
 
 const teenyRequest =
     ((reqOpts: r.OptionsWithUri, callback?: Callback) => {
@@ -90,29 +113,14 @@ const teenyRequest =
 
       const multipart: r.RequestPart[] = reqOpts.multipart as r.RequestPart[];
       if (reqOpts.multipart && multipart.length === 2) {
-        const boundary = 'someRandomBoundaryString';
-        const finale = `--${boundary}--`;
-        const mediaStream: PassThrough = new PassThrough();
-
-        for (const part of multipart) {
-          const preamble = `--${boundary}\r\nContent-Type: ${
-              (part as {['Content-Type']?: string})['Content-Type']}\r\n\r\n`;
-          mediaStream.push(preamble);
-          if (typeof part.body === 'string') {
-            mediaStream.push(part.body);
-            mediaStream.push('\r\n');
-          } else {
-            part.body.pipe(mediaStream, {end: false});
-            part.body.on('end', () => {
-              mediaStream.push('\r\n');
-              mediaStream.push(finale);
-              mediaStream.push(null);
-            });
-          }
+        if (!callback) {
+          console.log('Error, multipart without callback not implemented.');
+          return;
         }
+        const boundary = 'someRandomBoundaryString';
         (options.headers as Headers)['Content-Type'] =
             `multipart/related; boundary=${boundary}`;
-        options.body = mediaStream;
+        options.body = createMultipartStream(boundary, multipart);
 
         // Multipart upload
         fetch(uri as string, options as f.RequestInit)
@@ -120,7 +128,7 @@ const teenyRequest =
               const header: string|null = res.headers.get('content-type');
               if (header === 'application/json' ||
                   header === 'application/json; charset=utf-8') {
-                const response = fetchToRequestResponse(res);
+                const response: r.Response = fetchToRequestResponse(res);
                 if (response.statusCode === 204) {
                   // Probably a DELETE
                   callback!(null, response, response);
