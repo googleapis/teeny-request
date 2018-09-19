@@ -170,13 +170,15 @@ const teenyRequest =
                 // tslint:disable-next-line:no-any
                 const error: any = new Error(res.statusText);
                 error.code = res.status;
+                console.log(
+                    'whoa there was an error, passing it on: ' + res.statusText);
                 requestStream.emit('error', error);
                 return;
               }
 
               const encoding: string|null = res.headers.get('content-encoding');
               res.body.on('error', err => {
-                console.log('whoa there was an error, passing it on' + err);
+                console.log('whoa there was an error, passing it on: ' + err);
                 requestStream.emit('error', err);
               });
 
@@ -196,10 +198,10 @@ const teenyRequest =
 
         // fetch doesn't supply the raw HTTP stream, instead it
         // returns a PassThrough piped from the HTTP response
-        // stream
+        // stream.
         return requestStream;
       }
-      // regular fetch
+      // GET or POST with callback
       fetch(uri as string, options as f.RequestInit)
           .then((res: f.Response) => {
             const header: string|null = res.headers.get('content-type');
