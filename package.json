@@ -34,12 +34,14 @@
   "homepage": "https://github.com/fhinkel/teeny-request#readme",
   "dependencies": {
     "https-proxy-agent": "^2.2.1",
-    "node-fetch": "^2.2.0"
+    "node-fetch": "^2.2.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.5",
     "@types/node-fetch": "^2.1.2",
     "@types/request": "^2.47.1",
+    "@types/uuid": "^3.4.4",
     "gts": "^0.8.0",
     "mocha": "^5.2.0",
     "typescript": "^3.0.1"

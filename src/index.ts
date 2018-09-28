@@ -1,8 +1,10 @@
 'use strict';
 
-import * as r from 'request';
+import * as r from 'request';  // Only for type declarations
 import fetch, * as f from 'node-fetch';
 import {PassThrough} from 'stream';
+import * as uuid from 'uuid';
+
 // tslint:disable-next-line variable-name
 const HttpsProxyAgent = require('https-proxy-agent');
 
@@ -117,7 +119,7 @@ const teenyRequest =
           console.log('Error, multipart without callback not implemented.');
           return;
         }
-        const boundary = 'someRandomBoundaryStringverymuchrandomsorandom';
+        const boundary: string = uuid.v4();
         (options.headers as Headers)['Content-Type'] =
             `multipart/related; boundary=${boundary}`;
         options.body = createMultipartStream(boundary, multipart);
