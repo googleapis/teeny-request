@@ -166,7 +166,8 @@ const teenyRequest =
                 const error: any = new Error(res.statusText);
                 error.code = res.status;
                 console.log(
-                    'whoa there was an error, passing it on: ' + res.statusText);
+                    'whoa there was an error, passing it on: ' +
+                    res.statusText);
                 requestStream.emit('error', error);
                 return;
               }
