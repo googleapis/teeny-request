@@ -172,8 +172,8 @@ const teenyRequest =
                       requestStream.emit('error', error);
                       return;
                     })
-                    .catch(err => {
-                      callback!(err);
+                    .catch(error => {
+                      requestStream.emit('error', error);
                     });
                 return;
               }
