@@ -175,6 +175,7 @@ const teenyRequest =
                     .catch(err => {
                       callback!(err);
                     });
+                return;
               }
 
               const encoding: string|null = res.headers.get('content-encoding');
