@@ -162,14 +162,17 @@ const teenyRequest =
         fetch(uri as string, options as f.RequestInit)
             .then((res: f.Response) => {
               if (!res.ok) {
-                // tslint:disable-next-line:no-any
-                const error: any = new Error(res.statusText);
-                error.code = res.status;
-                console.log(
-                    'whoa there was an error, passing it on: ' +
-                    res.statusText);
-                requestStream.emit('error', error);
-                return;
+                res.text()
+                    .then(text => {
+                      // tslint:disable-next-line:no-any
+                      const error: any = new Error(text);
+                      error.code = res.status;
+                      requestStream.emit('error', error);
+                      return;
+                    })
+                    .catch(err => {
+                      callback!(err);
+                    });
               }
 
               const encoding: string|null = res.headers.get('content-encoding');
