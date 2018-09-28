@@ -91,16 +91,16 @@ const createMultipartStream =
       for (const part of multipart) {
         const preamble = `--${boundary}\r\nContent-Type: ${
             (part as {['Content-Type']?: string})['Content-Type']}\r\n\r\n`;
-        stream.push(preamble);
+        stream.write(preamble);
         if (typeof part.body === 'string') {
-          stream.push(part.body);
-          stream.push('\r\n');
+          stream.write(part.body);
+          stream.write('\r\n');
         } else {
           part.body.pipe(stream, {end: false});
           part.body.on('end', () => {
-            stream.push('\r\n');
-            stream.push(finale);
-            stream.push(null);
+            stream.write('\r\n');
+            stream.write(finale);
+            stream.end();
           });
         }
       }
@@ -117,7 +117,7 @@ const teenyRequest =
           console.log('Error, multipart without callback not implemented.');
           return;
         }
-        const boundary = 'someRandomBoundaryString';
+        const boundary = 'someRandomBoundaryStringverymuchrandomsorandom';
         (options.headers as Headers)['Content-Type'] =
             `multipart/related; boundary=${boundary}`;
         options.body = createMultipartStream(boundary, multipart);
@@ -129,11 +129,6 @@ const teenyRequest =
               if (header === 'application/json' ||
                   header === 'application/json; charset=utf-8') {
                 const response: r.Response = fetchToRequestResponse(res);
-                if (response.statusCode === 204) {
-                  // Probably a DELETE
-                  callback!(null, response, response);
-                  return;
-                }
                 res.json()
                     .then(json => {
                       response.body = json;
