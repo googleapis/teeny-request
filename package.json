@@ -3,6 +3,7 @@
   "version": "3.9.0",
   "description": "Like request, but smaller.",
   "main": "./build/src/index.js",
+  "types": "./build/src/index.d.ts",
   "scripts": {
     "test": "mocha build/test",
     "compile": "tsc -p .",
