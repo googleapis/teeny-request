@@ -102,7 +102,8 @@ function createMultipartStream(boundary: string, multipart: r.RequestPart[]) {
 
 function teenyRequest(reqOpts: r.Options): PassThrough;
 function teenyRequest(reqOpts: r.Options, callback: r.RequestCallback): void;
-function teenyRequest(reqOpts: r.Options, callback?: r.RequestCallback): PassThrough|void {
+function teenyRequest(
+    reqOpts: r.Options, callback?: r.RequestCallback): PassThrough|void {
   const {uri, options} = requestToFetchOptions(reqOpts);
 
   const multipart: r.RequestPart[] = reqOpts.multipart as r.RequestPart[];

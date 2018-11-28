@@ -35,13 +35,15 @@ describe('teeny', () => {
   it('response event emits object compatible with request module', done => {
     const reqStream = teenyRequest({uri: 'http://www.example.com'});
     reqStream
-      .on('response', (message) => {
-        assert.equal(202, message.statusCode);
-        assert.equal('test-header-value', message.headers['x-example-header']);
-        done();
-      })
-      .on('error', (err) => {
-        done(err);
-      });
+        .on('response',
+            (message) => {
+              assert.equal(202, message.statusCode);
+              assert.equal(
+                  'test-header-value', message.headers['x-example-header']);
+              done();
+            })
+        .on('error', (err) => {
+          done(err);
+        });
   });
 });
