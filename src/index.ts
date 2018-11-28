@@ -2,6 +2,7 @@ import * as r from 'request';  // Only for type declarations
 import fetch, * as f from 'node-fetch';
 import {PassThrough} from 'stream';
 import * as uuid from 'uuid';
+import { STATUS_CODES } from 'http';
 
 // tslint:disable-next-line variable-name
 const HttpsProxyAgent = require('https-proxy-agent');
@@ -172,20 +173,18 @@ const teenyRequest =
                 return;
               }
 
-              const encoding: string|null = res.headers.get('content-encoding');
               res.body.on('error', err => {
                 console.log('whoa there was an error, passing it on: ' + err);
                 requestStream.emit('error', err);
               });
 
-              // tslint:disable-next-line:no-any
-              (res.body as any).toJSON = () => {
-                const headers: Headers|
-                    {} = {...(encoding && {'content-encoding': encoding})};
-                return {headers};
-              };
+              const headers = Object.assign({}, res.headers.raw());
 
-              requestStream.emit('response', res.body);
+              requestStream.emit('response', {
+                headers,
+                statusCode: res.status,
+                statusMessage: res.statusText,
+              });
             })
             .catch((err: Error) => {
               console.log('such a nice error:' + err);
