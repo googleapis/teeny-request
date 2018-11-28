@@ -2,8 +2,6 @@ import * as r from 'request';  // Only for type declarations
 import fetch, * as f from 'node-fetch';
 import {PassThrough} from 'stream';
 import * as uuid from 'uuid';
-import { STATUS_CODES } from 'http';
-import { deepEqual } from 'assert';
 
 // tslint:disable-next-line variable-name
 const HttpsProxyAgent = require('https-proxy-agent');
@@ -239,14 +237,15 @@ const teenyRequest =
     }) as TeenyRequest;
 
 teenyRequest.defaults = (defaults: r.Options) => {
-  return (reqOpts: r.Options, callback?: r.RequestCallback): PassThrough|void => {
-    const opts = {...defaults, reqOpts};
-    if (callback === undefined) {
-      return teenyRequest(opts);
-    } else {
-      teenyRequest(opts, callback);
-    }
-  };
+  return (reqOpts: r.Options, callback?: r.RequestCallback): PassThrough|
+      void => {
+        const opts = {...defaults, reqOpts};
+        if (callback === undefined) {
+          return teenyRequest(opts);
+        } else {
+          teenyRequest(opts, callback);
+        }
+      };
 };
 
 export {teenyRequest};
