@@ -1,6 +1,3 @@
-
-'use strict';
-
 import * as assert from 'assert';
 import * as r from 'request';
 
@@ -19,8 +16,7 @@ describe('teeny', () => {
           done();
         });
   }), it('should set defaults', (done) => {
-    const defaultRequest =
-        teenyRequest.defaults({timeout: 60000} as r.OptionsWithUri);
+    const defaultRequest = teenyRequest.defaults({timeout: 60000} as r.Options);
     defaultRequest(
         {uri: 'https://jsonplaceholder.typicode.com/todos/1'},
         // tslint:disable-next-line:no-any
