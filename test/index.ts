@@ -4,7 +4,7 @@ import * as r from 'request';
 
 import {teenyRequest} from '../src';
 
-nock('http://www.example.com').persist().get('/').reply(403, 'Denied', {
+nock('http://www.example.com').persist().get('/').reply(202, 'ok', {
   'X-Example-Header': 'test-header-value',
 });
 
@@ -34,10 +34,14 @@ describe('teeny', () => {
 
   it('response event emits object compatible with request module', done => {
     const reqStream = teenyRequest({uri: 'http://www.example.com'});
-    reqStream.on('response', (message) => {
-      assert.equal(403, message.statusCode);
-      assert.equal('test-header-value', message.header['x-example-header']);
-      reqStream.on('end', done);
-    });
+    reqStream
+      .on('response', (message) => {
+        assert.equal(202, message.statusCode);
+        assert.equal('test-header-value', message.headers['x-example-header']);
+        done();
+      })
+      .on('error', (err) => {
+        done(err);
+      });
   });
 });

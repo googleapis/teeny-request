@@ -239,7 +239,7 @@ const teenyRequest =
 teenyRequest.defaults = (defaults: r.Options) => {
   return (reqOpts: r.Options, callback?: r.RequestCallback): PassThrough|
       void => {
-        const opts = {...defaults, reqOpts};
+        const opts = {...defaults, ...reqOpts};
         if (callback === undefined) {
           return teenyRequest(opts);
         } else {
