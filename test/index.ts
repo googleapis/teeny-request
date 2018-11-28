@@ -4,9 +4,11 @@ import * as r from 'request';
 
 import {teenyRequest} from '../src';
 
-nock('http://www.example.com').persist().get('/').reply(202, 'ok', {
-  'X-Example-Header': 'test-header-value',
-});
+function nockSuccessfulResponse() {
+  return nock('http://www.example.com').get('/').reply(202, 'ok', {
+    'X-Example-Header': 'test-header-value',
+  });
+}
 
 describe('teeny', () => {
   it('should get JSON', (done) => {
@@ -33,6 +35,8 @@ describe('teeny', () => {
   });
 
   it('response event emits object compatible with request module', done => {
+    const mock = nockSuccessfulResponse();
+
     const reqStream = teenyRequest({uri: 'http://www.example.com'});
     reqStream
         .on('response',
@@ -40,6 +44,7 @@ describe('teeny', () => {
               assert.equal(202, message.statusCode);
               assert.equal(
                   'test-header-value', message.headers['x-example-header']);
+              assert.ifError(mock.done());
               done();
             })
         .on('error', (err) => {
