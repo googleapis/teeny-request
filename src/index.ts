@@ -3,6 +3,7 @@ import fetch, * as f from 'node-fetch';
 import {PassThrough} from 'stream';
 import * as uuid from 'uuid';
 import { STATUS_CODES } from 'http';
+import { deepEqual } from 'assert';
 
 // tslint:disable-next-line variable-name
 const HttpsProxyAgent = require('https-proxy-agent');
@@ -74,9 +75,10 @@ const fetchToRequestResponse: FetchToRequestResponse = (res: f.Response) => {
 // or `request.defaults(opts)(options, callback)`
 interface TeenyRequest {
   (reqOpts: r.Options, callback: r.RequestCallback): void;
+  (reqOpts: r.Options): PassThrough;
   defaults:
       ((options: r.Options) =>
-           ((reqOpts: r.Options, callback: r.RequestCallback) => void));
+           ((reqOpts: r.Options, callback?: r.RequestCallback) => void));
 }
 
 // create POST body from two parts as multipart/related content-type
@@ -237,8 +239,13 @@ const teenyRequest =
     }) as TeenyRequest;
 
 teenyRequest.defaults = (defaults: r.Options) => {
-  return (reqOpts: r.Options, callback: r.RequestCallback) => {
-    return teenyRequest({...defaults, ...reqOpts}, callback);
+  return (reqOpts: r.Options, callback?: r.RequestCallback): PassThrough|void => {
+    const opts = {...defaults, reqOpts};
+    if (callback === undefined) {
+      return teenyRequest(opts);
+    } else {
+      teenyRequest(opts, callback);
+    }
   };
 };
 
