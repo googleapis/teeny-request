@@ -239,9 +239,8 @@ teenyRequest.defaults = (defaults: r.Options) => {
         const opts = {...defaults, ...reqOpts};
         if (callback === undefined) {
           return teenyRequest(opts);
-        } else {
-          teenyRequest(opts, callback);
         }
+        teenyRequest(opts, callback);
       };
 };
 
