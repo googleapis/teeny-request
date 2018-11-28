@@ -61,10 +61,6 @@ const requestToFetchOptions: RequestToFetchOptions = (reqOpts: r.Options) => {
   return [uri, options];
 };
 
-interface Callback {
-  (err: Error|null, response?: r.Response, body?: {}|string): void;
-}
-
 const fetchToRequestResponse: FetchToRequestResponse = (res: f.Response) => {
   const response: r.Response = {
     statusCode: res.status,
@@ -76,10 +72,10 @@ const fetchToRequestResponse: FetchToRequestResponse = (res: f.Response) => {
 // Mimics `request`. Can be used as `request(options, callback)`
 // or `request.defaults(opts)(options, callback)`
 interface TeenyRequest {
-  (reqOpts: r.Options, callback: Callback): void;
+  (reqOpts: r.Options, callback: r.RequestCallback): void;
   defaults:
-      ((options:
-            r.Options) => ((reqOpts: r.Options, callback: Callback) => void));
+      ((options: r.Options) =>
+           ((reqOpts: r.Options, callback: r.RequestCallback) => void));
 }
 
 // create POST body from two parts as multipart/related content-type
@@ -108,7 +104,7 @@ const createMultipartStream =
     };
 
 const teenyRequest =
-    ((reqOpts: r.Options, callback?: Callback) => {
+    ((reqOpts: r.Options, callback?: r.RequestCallback) => {
       const [uri, options] = requestToFetchOptions(reqOpts);
 
       const multipart: r.RequestPart[] = reqOpts.multipart as r.RequestPart[];
@@ -126,32 +122,32 @@ const teenyRequest =
         fetch(uri as string, options as f.RequestInit)
             .then((res: f.Response) => {
               const header: string|null = res.headers.get('content-type');
+              const response = fetchToRequestResponse(res);
+              const body = response.body;
               if (header === 'application/json' ||
                   header === 'application/json; charset=utf-8') {
-                const response: r.Response = fetchToRequestResponse(res);
                 res.json()
                     .then(json => {
                       response.body = json;
-                      callback!(null, response, json);
+                      callback(null, response, json);
                     })
                     .catch((err: Error) => {
-                      callback!(err);
+                      callback(err, response, body);
                     });
                 return;
               }
 
               res.text()
                   .then(text => {
-                    const response = fetchToRequestResponse(res);
                     response.body = text;
-                    callback!(null, response, text);
+                    callback(null, response, text);
                   })
                   .catch(err => {
-                    callback!(err);
+                    callback(err, response, body);
                   });
             })
             .catch((err: Error) => {
-              callback!(err);
+              callback(err, null!, null);
             });
         return;
       }
@@ -205,21 +201,22 @@ const teenyRequest =
       fetch(uri as string, options as f.RequestInit)
           .then((res: f.Response) => {
             const header: string|null = res.headers.get('content-type');
+            const response = fetchToRequestResponse(res);
+            const body = response.body;
             if (header === 'application/json' ||
                 header === 'application/json; charset=utf-8') {
-              const response = fetchToRequestResponse(res);
               if (response.statusCode === 204) {
                 // Probably a DELETE
-                callback!(null, response, response);
+                callback(null, response, body);
                 return;
               }
               res.json()
                   .then(json => {
                     response.body = json;
-                    callback!(null, response, json);
+                    callback(null, response, json);
                   })
                   .catch((err: Error) => {
-                    callback!(err);
+                    callback(err, response, body);
                   });
               return;
             }
@@ -228,23 +225,20 @@ const teenyRequest =
                 .then(text => {
                   const response = fetchToRequestResponse(res);
                   response.body = text;
-                  callback!(null, response, text);
+                  callback(null, response, text);
                 })
                 .catch(err => {
-                  callback!(err);
+                  callback(err, response, body);
                 });
           })
           .catch((err: Error) => {
-            callback!(err);
+            callback(err, null!, null);
           });
       return;
     }) as TeenyRequest;
 
 teenyRequest.defaults = (defaults: r.Options) => {
-  return (reqOpts: r.Options,
-          callback:
-              (err: Error|null, response?: r.Response, body?: {}|string) =>
-                  void) => {
+  return (reqOpts: r.Options, callback: r.RequestCallback) => {
     return teenyRequest({...defaults, ...reqOpts}, callback);
   };
 };
