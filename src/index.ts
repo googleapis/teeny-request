@@ -100,8 +100,10 @@ function createMultipartStream(boundary: string, multipart: r.RequestPart[]) {
   return stream;
 }
 
-
-function teenyRequest(reqOpts: r.Options, callback?: r.RequestCallback) {
+function teenyRequest(reqOpts: r.Options): PassThrough;
+function teenyRequest(reqOpts: r.Options, callback: r.RequestCallback): void;
+function teenyRequest(
+    reqOpts: r.Options, callback?: r.RequestCallback): PassThrough|void {
   const {uri, options} = requestToFetchOptions(reqOpts);
 
   const multipart: r.RequestPart[] = reqOpts.multipart as r.RequestPart[];
@@ -168,20 +170,18 @@ function teenyRequest(reqOpts: r.Options, callback?: r.RequestCallback) {
             return;
           }
 
-          const encoding = res.headers.get('content-encoding');
           res.body.on('error', err => {
             console.log('whoa there was an error, passing it on: ' + err);
             requestStream.emit('error', err);
           });
 
-          // tslint:disable-next-line:no-any
-          (res.body as any).toJSON = () => {
-            const headers: Headers|
-                {} = {...(encoding && {'content-encoding': encoding})};
-            return {headers};
-          };
+          const headers = Object.assign({}, res.headers.raw());
 
-          requestStream.emit('response', res.body);
+          requestStream.emit('response', {
+            headers,
+            statusCode: res.status,
+            statusMessage: res.statusText,
+          });
         })
         .catch((err: Error) => {
           console.log('such a nice error:' + err);
@@ -234,9 +234,14 @@ function teenyRequest(reqOpts: r.Options, callback?: r.RequestCallback) {
 }
 
 teenyRequest.defaults = (defaults: r.Options) => {
-  return (reqOpts: r.Options, callback: r.RequestCallback) => {
-    return teenyRequest({...defaults, ...reqOpts}, callback);
-  };
+  return (reqOpts: r.Options, callback?: r.RequestCallback): PassThrough|
+      void => {
+        const opts = {...defaults, ...reqOpts};
+        if (callback === undefined) {
+          return teenyRequest(opts);
+        }
+        teenyRequest(opts, callback);
+      };
 };
 
 export {teenyRequest};
