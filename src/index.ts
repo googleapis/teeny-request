@@ -1,6 +1,6 @@
 import * as r from 'request';  // Only for type declarations
 import fetch, * as f from 'node-fetch';
-import {PassThrough} from 'stream';
+import {PassThrough, Stream} from 'stream';
 import * as uuid from 'uuid';
 
 // tslint:disable-next-line variable-name
@@ -111,10 +111,10 @@ function createMultipartStream(boundary: string, multipart: r.RequestPart[]) {
   return stream;
 }
 
-function teenyRequest(reqOpts: r.Options): PassThrough;
+function teenyRequest(reqOpts: r.Options): Stream;
 function teenyRequest(reqOpts: r.Options, callback: r.RequestCallback): void;
-function teenyRequest(
-    reqOpts: r.Options, callback?: r.RequestCallback): PassThrough|void {
+function teenyRequest(reqOpts: r.Options, callback?: r.RequestCallback): Stream|
+    void {
   const {uri, options} = requestToFetchOptions(reqOpts);
 
   const multipart: r.RequestPart[] = reqOpts.multipart as r.RequestPart[];
@@ -249,14 +249,13 @@ function teenyRequest(
 }
 
 teenyRequest.defaults = (defaults: r.OptionalUriUrl) => {
-  return (reqOpts: r.Options, callback?: r.RequestCallback): PassThrough|
-      void => {
-        const opts = {...defaults, ...reqOpts};
-        if (callback === undefined) {
-          return teenyRequest(opts);
-        }
-        teenyRequest(opts, callback);
-      };
+  return (reqOpts: r.Options, callback?: r.RequestCallback): Stream|void => {
+    const opts = {...defaults, ...reqOpts};
+    if (callback === undefined) {
+      return teenyRequest(opts);
+    }
+    teenyRequest(opts, callback);
+  };
 };
 
 export {teenyRequest};
