@@ -23,7 +23,7 @@ describe('teeny', () => {
   });
 
   it('should set defaults', (done) => {
-    const defaultRequest = teenyRequest.defaults({timeout: 60000} as r.Options);
+    const defaultRequest = teenyRequest.defaults({timeout: 60000});
     defaultRequest(
         {uri: 'https://jsonplaceholder.typicode.com/todos/1'},
         (error, response, body) => {

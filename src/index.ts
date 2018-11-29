@@ -233,7 +233,7 @@ function teenyRequest(
   return;
 }
 
-teenyRequest.defaults = (defaults: r.Options) => {
+teenyRequest.defaults = (defaults: r.OptionalUriUrl) => {
   return (reqOpts: r.Options, callback?: r.RequestCallback): PassThrough|
       void => {
         const opts = {...defaults, ...reqOpts};
