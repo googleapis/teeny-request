@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as nock from 'nock';
-import * as r from 'request';
+import {URL} from 'url';
 
 import {teenyRequest} from '../src';
 
@@ -12,7 +12,7 @@ function mockJson() {
 }
 
 function nockSuccessfulResponse() {
-  return nock('http://example.com').get('/').reply(202, 'ok', {
+  return nock(uri).get('/').reply(202, 'ok', {
     'X-Example-Header': 'test-header-value',
   });
 }
@@ -54,5 +54,20 @@ describe('teeny', () => {
               done();
             })
         .on('error', done);
+  });
+
+  it('should include the request in the response', (done) => {
+    const path = '/?dessert=pie';
+    const scope = nock(uri).get(path).reply(202);
+    const headers = {dinner: 'tacos'};
+    const url = `${uri}${path}`;
+    teenyRequest({url, headers}, (error, response) => {
+      assert.ifError(error);
+      const req = response.request;
+      assert.deepStrictEqual(req.headers, headers);
+      assert.strictEqual(req.href, url);
+      scope.done();
+      done();
+    });
   });
 });

@@ -28,9 +28,7 @@ function requestToFetchOptions(reqOpts: r.Options) {
 
   if (typeof reqOpts.json === 'object') {
     // Add Content-type: application/json header
-    if (!reqOpts.headers) {
-      reqOpts.headers = {};
-    }
+    reqOpts.headers = reqOpts.headers || {};
     reqOpts.headers['Content-Type'] = 'application/json';
 
     // Set body to JSON representation of value
@@ -63,17 +61,26 @@ function requestToFetchOptions(reqOpts: r.Options) {
 
 /**
  * Convert a response from `fetch` to `request` format.
+ * @private
+ * @param opts The `request` options used to create the request.
  * @param res The Fetch response
+ * @returns A `request` response object
  */
-function fetchToRequestResponse(res: f.Response) {
+function fetchToRequestResponse(opts: r.Options, res: f.Response) {
+  const request = res.body as {} as r.Request;
+  request.headers = opts.headers || {};
+  request.href = res.url;
   return {
     statusCode: res.status,
     statusMessage: res.statusText,
+    request,
+    body: res.body
   } as r.Response;
 }
 
 /**
- * create POST body from two parts as multipart/related content-type
+ * Create POST body from two parts as multipart/related content-type
+ * @private
  * @param boundary
  * @param multipart
  */
@@ -118,10 +125,10 @@ function teenyRequest(
     options.body = createMultipartStream(boundary, multipart);
 
     // Multipart upload
-    fetch(uri as string, options as f.RequestInit)
+    fetch(uri, options)
         .then(res => {
-          const header: string|null = res.headers.get('content-type');
-          const response = fetchToRequestResponse(res);
+          const header = res.headers.get('content-type');
+          const response = fetchToRequestResponse(reqOpts, res);
           const body = response.body;
           if (header === 'application/json' ||
               header === 'application/json; charset=utf-8') {
@@ -197,7 +204,7 @@ function teenyRequest(
   fetch(uri, options)
       .then(res => {
         const header = res.headers.get('content-type');
-        const response = fetchToRequestResponse(res);
+        const response = fetchToRequestResponse(reqOpts, res);
         const body = response.body;
         if (header === 'application/json' ||
             header === 'application/json; charset=utf-8') {
@@ -219,7 +226,7 @@ function teenyRequest(
 
         res.text()
             .then(text => {
-              const response = fetchToRequestResponse(res);
+              const response = fetchToRequestResponse(reqOpts, res);
               response.body = text;
               callback(null, response, text);
             })
