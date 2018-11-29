@@ -10,12 +10,6 @@ function mockJson() {
   return nock(uri).get('/').reply(200, {'hello': '🌍'});
 }
 
-function nockSuccessfulResponse() {
-  return nock(uri).get('/').reply(202, 'ok', {
-    'X-Example-Header': 'test-header-value',
-  });
-}
-
 describe('teeny', () => {
   it('should get JSON', (done) => {
     const scope = mockJson();
@@ -41,14 +35,16 @@ describe('teeny', () => {
   });
 
   it('response event emits object compatible with request module', done => {
-    const scope = nockSuccessfulResponse();
-    const reqStream = teenyRequest({uri});
+    const reqHeaders = {fruit: 'banana'};
+    const resHeaders = {veggies: 'carrots'};
+    const scope = nock(uri).get('/').reply(202, 'ok', resHeaders);
+    const reqStream = teenyRequest({uri, headers: reqHeaders});
     reqStream
         .on('response',
-            message => {
-              assert.strictEqual(202, message.statusCode);
-              assert.strictEqual(
-                  'test-header-value', message.headers['x-example-header']);
+            res => {
+              assert.strictEqual(202, res.statusCode);
+              assert.strictEqual(res.headers.veggies, 'carrots');
+              assert.deepStrictEqual(res.request.headers, reqHeaders);
               scope.done();
               done();
             })

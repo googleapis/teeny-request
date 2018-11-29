@@ -1,6 +1,6 @@
 import * as r from 'request';  // Only for type declarations
 import fetch, * as f from 'node-fetch';
-import {PassThrough, Stream} from 'stream';
+import {PassThrough} from 'stream';
 import * as uuid from 'uuid';
 
 // tslint:disable-next-line variable-name
@@ -111,13 +111,13 @@ function createMultipartStream(boundary: string, multipart: r.RequestPart[]) {
   return stream;
 }
 
-function teenyRequest(reqOpts: r.Options): Stream;
+function teenyRequest(reqOpts: r.Options): r.Request;
 function teenyRequest(reqOpts: r.Options, callback: r.RequestCallback): void;
-function teenyRequest(reqOpts: r.Options, callback?: r.RequestCallback): Stream|
-    void {
+function teenyRequest(
+    reqOpts: r.Options, callback?: r.RequestCallback): r.Request|void {
   const {uri, options} = requestToFetchOptions(reqOpts);
 
-  const multipart: r.RequestPart[] = reqOpts.multipart as r.RequestPart[];
+  const multipart = reqOpts.multipart as r.RequestPart[];
   if (reqOpts.multipart && multipart.length === 2) {
     if (!callback) {
       console.log('Error, multipart without callback not implemented.');
@@ -188,14 +188,8 @@ function teenyRequest(reqOpts: r.Options, callback?: r.RequestCallback): Stream|
                 requestStream.emit('error', err);
               });
 
-              const headers = {} as Headers;
-              res.headers.forEach((value, key) => headers[key] = value);
-
-              requestStream.emit('response', {
-                headers,
-                statusCode: res.status,
-                statusMessage: res.statusText,
-              });
+              const response = fetchToRequestResponse(reqOpts, res);
+              requestStream.emit('response', response);
             },
             err => {
               console.log('such a nice error:' + err);
@@ -205,7 +199,7 @@ function teenyRequest(reqOpts: r.Options, callback?: r.RequestCallback): Stream|
     // fetch doesn't supply the raw HTTP stream, instead it
     // returns a PassThrough piped from the HTTP response
     // stream.
-    return requestStream;
+    return requestStream as {} as r.Request;
   }
   // GET or POST with callback
   fetch(uri, options)
@@ -249,7 +243,7 @@ function teenyRequest(reqOpts: r.Options, callback?: r.RequestCallback): Stream|
 }
 
 teenyRequest.defaults = (defaults: r.OptionalUriUrl) => {
-  return (reqOpts: r.Options, callback?: r.RequestCallback): Stream|void => {
+  return (reqOpts: r.Options, callback?: r.RequestCallback): r.Request|void => {
     const opts = {...defaults, ...reqOpts};
     if (callback === undefined) {
       return teenyRequest(opts);
