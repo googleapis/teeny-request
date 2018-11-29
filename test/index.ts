@@ -1,6 +1,5 @@
 import * as assert from 'assert';
 import * as nock from 'nock';
-import {URL} from 'url';
 
 import {teenyRequest} from '../src';
 
@@ -77,6 +76,18 @@ describe('teeny', () => {
     teenyRequest({uri}, err => {
       assert.ok(err);
       assert.ok(err.message.match(/^invalid json response body/));
+      scope.done();
+      done();
+    });
+  });
+
+  it('should include headers in the response', (done) => {
+    const headers = {dinner: 'tacos'};
+    const body = {'hello': '🌍'};
+    const scope = nock(uri).get('/').reply(200, body, headers);
+    teenyRequest({uri}, (err, res) => {
+      assert.ifError(err);
+      assert.strictEqual(headers['dinner'], res.headers['dinner']);
       scope.done();
       done();
     });
