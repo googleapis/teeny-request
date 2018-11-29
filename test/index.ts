@@ -70,4 +70,15 @@ describe('teeny', () => {
       done();
     });
   });
+
+  it('should not wrap the error', (done) => {
+    const scope = nock(uri).get('/').reply(
+        200, '🚨', {'content-type': 'application/json'});
+    teenyRequest({uri}, err => {
+      assert.ok(err);
+      assert.ok(err.message.match(/^invalid json response body/));
+      scope.done();
+      done();
+    });
+  });
 });
