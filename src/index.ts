@@ -67,19 +67,23 @@ function requestToFetchOptions(reqOpts: r.Options) {
  * @returns A `request` response object
  */
 function fetchToRequestResponse(opts: r.Options, res: f.Response) {
-  const request = res.body as {} as r.Request;
+  const request = {} as r.Request;
   request.headers = opts.headers || {};
   request.href = res.url;
   // headers need to be converted from a map to an obj
-  const headers = {} as Headers;
-  res.headers.forEach((value, key) => headers[key] = value);
-  return {
+  const resHeaders = {} as Headers;
+  res.headers.forEach((value, key) => resHeaders[key] = value);
+
+  const response = Object.assign(res.body, {
     statusCode: res.status,
     statusMessage: res.statusText,
     request,
     body: res.body,
-    headers,
-  } as r.Response;
+    headers: resHeaders,
+    toJSON: () => ({headers: resHeaders}),
+  });
+
+  return response as r.Response;
 }
 
 /**
