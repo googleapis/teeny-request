@@ -70,11 +70,15 @@ function fetchToRequestResponse(opts: r.Options, res: f.Response) {
   const request = res.body as {} as r.Request;
   request.headers = opts.headers || {};
   request.href = res.url;
+  // headers need to be converted from a map to an obj
+  const headers = {} as Headers;
+  res.headers.forEach((value, key) => headers[key] = value);
   return {
     statusCode: res.status,
     statusMessage: res.statusText,
     request,
-    body: res.body
+    body: res.body,
+    headers,
   } as r.Response;
 }
 
