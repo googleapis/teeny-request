@@ -4,51 +4,55 @@ import * as r from 'request';
 
 import {teenyRequest} from '../src';
 
+nock.disableNetConnect();
+const uri = 'http://example.com';
+
+function mockJson() {
+  return nock(uri).get('/').reply(200, {'hello': '🌍'});
+}
+
 function nockSuccessfulResponse() {
-  return nock('http://www.example.com').get('/').reply(202, 'ok', {
+  return nock('http://example.com').get('/').reply(202, 'ok', {
     'X-Example-Header': 'test-header-value',
   });
 }
 
 describe('teeny', () => {
   it('should get JSON', (done) => {
-    teenyRequest(
-        {uri: 'https://jsonplaceholder.typicode.com/todos/1'},
-        (error, response, body) => {
-          assert.ifError(error);
-          assert.strictEqual(response!.statusCode, 200);
-          assert.notEqual(body!.userId, null);
-          done();
-        });
+    const scope = mockJson();
+    teenyRequest({uri}, (error, response, body) => {
+      assert.ifError(error);
+      assert.strictEqual(response.statusCode, 200);
+      assert.ok(body.hello);
+      scope.done();
+      done();
+    });
   });
 
   it('should set defaults', (done) => {
+    const scope = mockJson();
     const defaultRequest = teenyRequest.defaults({timeout: 60000});
-    defaultRequest(
-        {uri: 'https://jsonplaceholder.typicode.com/todos/1'},
-        (error, response, body) => {
-          assert.ifError(error);
-          assert.strictEqual(response!.statusCode, 200);
-          assert.notEqual(body!.userId, null);
-          done();
-        });
+    defaultRequest({uri}, (error, response, body) => {
+      assert.ifError(error);
+      assert.strictEqual(response.statusCode, 200);
+      assert.ok(body.hello);
+      scope.done();
+      done();
+    });
   });
 
   it('response event emits object compatible with request module', done => {
-    const mock = nockSuccessfulResponse();
-
-    const reqStream = teenyRequest({uri: 'http://www.example.com'});
+    const scope = nockSuccessfulResponse();
+    const reqStream = teenyRequest({uri});
     reqStream
         .on('response',
-            (message) => {
+            message => {
               assert.equal(202, message.statusCode);
               assert.equal(
                   'test-header-value', message.headers['x-example-header']);
-              assert.ifError(mock.done());
+              scope.done();
               done();
             })
-        .on('error', (err) => {
-          done(err);
-        });
+        .on('error', done);
   });
 });

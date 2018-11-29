@@ -5,14 +5,15 @@
   "main": "./build/src/index.js",
   "types": "./build/src/index.d.ts",
   "scripts": {
-    "test": "mocha build/test",
+    "test": "nyc mocha build/test",
     "compile": "tsc -p .",
     "pretest": "npm run compile",
     "check": "gts check",
     "clean": "gts clean",
     "fix": "gts fix",
     "prepare": "npm run compile",
-    "posttest": "npm run check"
+    "posttest": "npm run check",
+    "coverage": "nyc report --reporter=json && codecov -f coverage/*.json"
   },
   "files": [
     "build/src",
@@ -44,9 +45,16 @@
     "@types/node-fetch": "^2.1.2",
     "@types/request": "^2.47.1",
     "@types/uuid": "^3.4.4",
+    "codecov": "^3.1.0",
     "gts": "^0.8.0",
     "mocha": "^5.2.0",
     "nock": "^10.0.2",
+    "nyc": "^13.1.0",
     "typescript": "^3.0.1"
+  },
+  "nyc": {
+    "exclude": [
+      "build/test"
+    ]
   }
 }
