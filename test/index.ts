@@ -31,7 +31,7 @@ describe('teeny', () => {
 
   it('should set defaults', (done) => {
     const scope = mockJson();
-    const defaultRequest = teenyRequest.defaults({timeout: 60000} as r.Options);
+    const defaultRequest = teenyRequest.defaults({timeout: 60000});
     defaultRequest({uri}, (error, response, body) => {
       assert.ifError(error);
       assert.strictEqual(response.statusCode, 200);
