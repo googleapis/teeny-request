@@ -46,8 +46,8 @@ describe('teeny', () => {
     reqStream
         .on('response',
             message => {
-              assert.equal(202, message.statusCode);
-              assert.equal(
+              assert.strictEqual(202, message.statusCode);
+              assert.strictEqual(
                   'test-header-value', message.headers['x-example-header']);
               scope.done();
               done();

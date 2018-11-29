@@ -188,7 +188,8 @@ function teenyRequest(
                 requestStream.emit('error', err);
               });
 
-              const headers = Object.assign({}, res.headers.raw());
+              const headers = {} as Headers;
+              res.headers.forEach((value, key) => headers[key] = value);
 
               requestStream.emit('response', {
                 headers,
