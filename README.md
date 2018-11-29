@@ -1,4 +1,6 @@
-# teeny-request
+[![Build Status](https://travis-ci.org/fhinkel/teeny-request.svg?branch=master)](https://travis-ci.org/fhinkel/teeny-request)
+
+# teeny-request 
 
 Like `request`, but much smaller - and with less options. Uses `node-fetch` under the hood. 
 Pop it in where you would use `request`. Improves load and parse time of modules. 
