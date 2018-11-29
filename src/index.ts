@@ -126,35 +126,36 @@ function teenyRequest(
 
     // Multipart upload
     fetch(uri, options)
-        .then(res => {
-          const header = res.headers.get('content-type');
-          const response = fetchToRequestResponse(reqOpts, res);
-          const body = response.body;
-          if (header === 'application/json' ||
-              header === 'application/json; charset=utf-8') {
-            res.json()
-                .then(json => {
-                  response.body = json;
-                  callback(null, response, json);
-                })
-                .catch((err: Error) => {
-                  callback(err, response, body);
-                });
-            return;
-          }
+        .then(
+            res => {
+              const header = res.headers.get('content-type');
+              const response = fetchToRequestResponse(reqOpts, res);
+              const body = response.body;
+              if (header === 'application/json' ||
+                  header === 'application/json; charset=utf-8') {
+                res.json().then(
+                    json => {
+                      response.body = json;
+                      callback(null, response, json);
+                    },
+                    (err: Error) => {
+                      callback(err, response, body);
+                    });
+                return;
+              }
 
-          res.text()
-              .then(text => {
-                response.body = text;
-                callback(null, response, text);
-              })
-              .catch(err => {
-                callback(err, response, body);
-              });
-        })
-        .catch((err: Error) => {
-          callback(err, null!, null);
-        });
+              res.text().then(
+                  text => {
+                    response.body = text;
+                    callback(null, response, text);
+                  },
+                  err => {
+                    callback(err, response, body);
+                  });
+            },
+            err => {
+              callback(err, null!, null);
+            });
     return;
   }
 
@@ -162,38 +163,39 @@ function teenyRequest(
     const requestStream = new PassThrough();
     options.compress = false;
     fetch(uri, options)
-        .then(res => {
-          if (!res.ok) {
-            res.text()
-                .then(text => {
-                  const error = new RequestError(text);
-                  error.code = res.status;
-                  requestStream.emit('error', error);
-                  return;
-                })
-                .catch(error => {
-                  requestStream.emit('error', error);
-                });
-            return;
-          }
+        .then(
+            res => {
+              if (!res.ok) {
+                res.text().then(
+                    text => {
+                      const error = new RequestError(text);
+                      error.code = res.status;
+                      requestStream.emit('error', error);
+                      return;
+                    },
+                    error => {
+                      requestStream.emit('error', error);
+                    });
+                return;
+              }
 
-          res.body.on('error', err => {
-            console.log('whoa there was an error, passing it on: ' + err);
-            requestStream.emit('error', err);
-          });
+              res.body.on('error', err => {
+                console.log('whoa there was an error, passing it on: ' + err);
+                requestStream.emit('error', err);
+              });
 
-          const headers = Object.assign({}, res.headers.raw());
+              const headers = Object.assign({}, res.headers.raw());
 
-          requestStream.emit('response', {
-            headers,
-            statusCode: res.status,
-            statusMessage: res.statusText,
-          });
-        })
-        .catch((err: Error) => {
-          console.log('such a nice error:' + err);
-          requestStream.emit('error', err);
-        });
+              requestStream.emit('response', {
+                headers,
+                statusCode: res.status,
+                statusMessage: res.statusText,
+              });
+            },
+            err => {
+              console.log('such a nice error:' + err);
+              requestStream.emit('error', err);
+            });
 
     // fetch doesn't supply the raw HTTP stream, instead it
     // returns a PassThrough piped from the HTTP response
@@ -202,41 +204,42 @@ function teenyRequest(
   }
   // GET or POST with callback
   fetch(uri, options)
-      .then(res => {
-        const header = res.headers.get('content-type');
-        const response = fetchToRequestResponse(reqOpts, res);
-        const body = response.body;
-        if (header === 'application/json' ||
-            header === 'application/json; charset=utf-8') {
-          if (response.statusCode === 204) {
-            // Probably a DELETE
-            callback(null, response, body);
-            return;
-          }
-          res.json()
-              .then(json => {
-                response.body = json;
-                callback(null, response, json);
-              })
-              .catch((err: Error) => {
-                callback(err, response, body);
-              });
-          return;
-        }
+      .then(
+          res => {
+            const header = res.headers.get('content-type');
+            const response = fetchToRequestResponse(reqOpts, res);
+            const body = response.body;
+            if (header === 'application/json' ||
+                header === 'application/json; charset=utf-8') {
+              if (response.statusCode === 204) {
+                // Probably a DELETE
+                callback(null, response, body);
+                return;
+              }
+              res.json().then(
+                  json => {
+                    response.body = json;
+                    callback(null, response, json);
+                  },
+                  err => {
+                    callback(err, response, body);
+                  });
+              return;
+            }
 
-        res.text()
-            .then(text => {
-              const response = fetchToRequestResponse(reqOpts, res);
-              response.body = text;
-              callback(null, response, text);
-            })
-            .catch(err => {
-              callback(err, response, body);
-            });
-      })
-      .catch((err: Error) => {
-        callback(err, null!, null);
-      });
+            res.text().then(
+                text => {
+                  const response = fetchToRequestResponse(reqOpts, res);
+                  response.body = text;
+                  callback(null, response, text);
+                },
+                err => {
+                  callback(err, response, body);
+                });
+          },
+          err => {
+            callback(err, null!, null);
+          });
   return;
 }
 
