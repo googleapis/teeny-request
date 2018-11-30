@@ -1,6 +1,8 @@
 import * as assert from 'assert';
 import * as nock from 'nock';
 import * as request from 'request';
+import {Readable} from 'stream';
+
 import {teenyRequest} from '../src';
 
 nock.disableNetConnect();
@@ -42,9 +44,16 @@ describe('teeny', () => {
     reqStream
         .on('response',
             res => {
-              assert.strictEqual(202, res.statusCode);
+              assert.strictEqual(res.statusCode, 202);
               assert.strictEqual(res.headers.veggies, 'carrots');
               assert.deepStrictEqual(res.request.headers, reqHeaders);
+              assert.deepStrictEqual(
+                  res.toJSON(),
+                  {
+                    headers: resHeaders,
+                  },
+              );
+              assert(res instanceof Readable);
               scope.done();
               done();
             })
