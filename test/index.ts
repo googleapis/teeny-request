@@ -1,6 +1,5 @@
 import * as assert from 'assert';
 import * as nock from 'nock';
-import * as request from 'request';
 import {Readable} from 'stream';
 
 import {teenyRequest} from '../src';
@@ -18,7 +17,7 @@ describe('teeny', () => {
     teenyRequest({uri}, (error, response, body) => {
       assert.ifError(error);
       assert.strictEqual(response.statusCode, 200);
-      assert.ok(body.hello);
+      assert.ok(body!.hello);
       scope.done();
       done();
     });
@@ -80,7 +79,7 @@ describe('teeny', () => {
         200, '🚨', {'content-type': 'application/json'});
     teenyRequest({uri}, err => {
       assert.ok(err);
-      assert.ok(err.message.match(/^invalid json response body/));
+      assert.ok(err!.message.match(/^invalid json response body/));
       scope.done();
       done();
     });
@@ -96,10 +95,5 @@ describe('teeny', () => {
       scope.done();
       done();
     });
-  });
-
-  it('should be castable to `Request`', () => {
-    const r = teenyRequest as typeof request;
-    assert.ok(r);
   });
 });

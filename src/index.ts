@@ -1,6 +1,5 @@
-import * as r from 'request';  // Only for type declarations
 import fetch, * as f from 'node-fetch';
-import {PassThrough} from 'stream';
+import {PassThrough, Duplex, Writable} from 'stream';
 import * as uuid from 'uuid';
 
 // tslint:disable-next-line variable-name
@@ -10,8 +9,57 @@ export class RequestError extends Error {
   code?: number;
 }
 
-interface Headers {
-  [index: string]: string;
+export interface Headers {
+  // tslint:disable-next-line no-any
+  [index: string]: any;
+}
+
+export interface Options {
+  method?: string;
+  timeout?: number;
+  gzip?: boolean;
+  json?: {}|string;
+  headers?: Headers;
+  uri?: string;
+  url?: string;
+  // tslint:disable-next-line no-any
+  body?: any;
+  useQuerystring?: boolean;
+  qs?: {}|string;
+  proxy?: {};
+  multipart?: RequestPart[];
+}
+
+export interface OptionsWithUri extends Options {
+  uri?: string;
+}
+
+export interface OptionsWithUrl extends Options {
+  url?: string;
+}
+
+export interface OptionalUriUrl extends OptionsWithUri, OptionsWithUrl {}
+
+export interface Request extends Duplex {
+  headers?: Headers;
+  href?: string;
+}
+
+// tslint:disable-next-line no-any
+export interface Response<T = any> {
+  body?: T;
+  statusCode: number;
+  request: Request;
+  headers: Headers;
+}
+
+export interface RequestPart {
+  body?: string|Writable;
+}
+
+// tslint:disable-next-line no-any
+export interface RequestCallback<T = any> {
+  (err: Error|null, response: Response<T>, body?: T|null): void;
 }
 
 /**
@@ -19,7 +67,7 @@ interface Headers {
  * @private
  * @param reqOpts Request options
  */
-function requestToFetchOptions(reqOpts: r.Options) {
+function requestToFetchOptions(reqOpts: Options) {
   const options: f.RequestInit = {
     method: reqOpts.method || 'GET',
     ...reqOpts.timeout && {timeout: reqOpts.timeout},
@@ -43,8 +91,8 @@ function requestToFetchOptions(reqOpts: r.Options) {
 
   options.headers = reqOpts.headers as Headers;
 
-  let uri = ((reqOpts as r.OptionsWithUri).uri ||
-             (reqOpts as r.OptionsWithUrl).url) as string;
+  let uri = ((reqOpts as OptionsWithUri).uri ||
+             (reqOpts as OptionsWithUrl).url) as string;
   if (reqOpts.useQuerystring === true || typeof reqOpts.qs === 'object') {
     const qs = require('querystring');
     const params = qs.stringify(reqOpts.qs);
@@ -66,8 +114,8 @@ function requestToFetchOptions(reqOpts: r.Options) {
  * @param res The Fetch response
  * @returns A `request` response object
  */
-function fetchToRequestResponse(opts: r.Options, res: f.Response) {
-  const request = {} as r.Request;
+function fetchToRequestResponse(opts: Options, res: f.Response) {
+  const request = {} as Request;
   request.headers = opts.headers || {};
   request.href = res.url;
   // headers need to be converted from a map to an obj
@@ -83,7 +131,7 @@ function fetchToRequestResponse(opts: r.Options, res: f.Response) {
     toJSON: () => ({headers: resHeaders}),
   });
 
-  return response as r.Response;
+  return response as Response;
 }
 
 /**
@@ -92,7 +140,7 @@ function fetchToRequestResponse(opts: r.Options, res: f.Response) {
  * @param boundary
  * @param multipart
  */
-function createMultipartStream(boundary: string, multipart: r.RequestPart[]) {
+function createMultipartStream(boundary: string, multipart: RequestPart[]) {
   const finale = `--${boundary}--`;
   const stream: PassThrough = new PassThrough();
 
@@ -104,8 +152,8 @@ function createMultipartStream(boundary: string, multipart: r.RequestPart[]) {
       stream.write(part.body);
       stream.write('\r\n');
     } else {
-      part.body.pipe(stream, {end: false});
-      part.body.on('end', () => {
+      (part.body as Writable).pipe(stream, {end: false});
+      (part.body as Writable).on('end', () => {
         stream.write('\r\n');
         stream.write(finale);
         stream.end();
@@ -115,13 +163,17 @@ function createMultipartStream(boundary: string, multipart: r.RequestPart[]) {
   return stream;
 }
 
-function teenyRequest(reqOpts: r.Options): r.Request;
-function teenyRequest(reqOpts: r.Options, callback: r.RequestCallback): void;
-function teenyRequest(
-    reqOpts: r.Options, callback?: r.RequestCallback): r.Request|void {
+// tslint:disable-next-line no-any
+function teenyRequest<T = any>(reqOpts: Options): Request;
+// tslint:disable-next-line no-any
+function teenyRequest<T = any>(
+    reqOpts: Options, callback: RequestCallback<T>): void;
+// tslint:disable-next-line no-any
+function teenyRequest<T = any>(
+    reqOpts: Options, callback?: RequestCallback<T>): Request|void {
   const {uri, options} = requestToFetchOptions(reqOpts);
 
-  const multipart = reqOpts.multipart as r.RequestPart[];
+  const multipart = reqOpts.multipart as RequestPart[];
   if (reqOpts.multipart && multipart.length === 2) {
     if (!callback) {
       console.log('Error, multipart without callback not implemented.');
@@ -155,7 +207,7 @@ function teenyRequest(
               res.text().then(
                   text => {
                     response.body = text;
-                    callback(null, response, text);
+                    callback(null, response, text as {} as T);
                   },
                   err => {
                     callback(err, response, body);
@@ -203,7 +255,7 @@ function teenyRequest(
     // fetch doesn't supply the raw HTTP stream, instead it
     // returns a PassThrough piped from the HTTP response
     // stream.
-    return requestStream as {} as r.Request;
+    return requestStream as {} as Request;
   }
   // GET or POST with callback
   fetch(uri, options)
@@ -234,7 +286,7 @@ function teenyRequest(
                 text => {
                   const response = fetchToRequestResponse(reqOpts, res);
                   response.body = text;
-                  callback(null, response, text);
+                  callback(null, response, text as {} as T);
                 },
                 err => {
                   callback(err, response, body);
@@ -246,8 +298,8 @@ function teenyRequest(
   return;
 }
 
-teenyRequest.defaults = (defaults: r.OptionalUriUrl) => {
-  return (reqOpts: r.Options, callback?: r.RequestCallback): r.Request|void => {
+teenyRequest.defaults = (defaults: OptionalUriUrl) => {
+  return (reqOpts: Options, callback?: RequestCallback): Request|void => {
     const opts = {...defaults, ...reqOpts};
     if (callback === undefined) {
       return teenyRequest(opts);
