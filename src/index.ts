@@ -173,20 +173,6 @@ function teenyRequest(
     fetch(uri, options)
         .then(
             res => {
-              if (!res.ok) {
-                res.text().then(
-                    text => {
-                      const error = new RequestError(text);
-                      error.code = res.status;
-                      requestStream.emit('error', error);
-                      return;
-                    },
-                    error => {
-                      requestStream.emit('error', error);
-                    });
-                return;
-              }
-
               res.body.on('error', err => {
                 console.log('whoa there was an error, passing it on: ' + err);
                 requestStream.emit('error', err);
