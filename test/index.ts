@@ -1,9 +1,9 @@
 import * as assert from 'assert';
 import * as nock from 'nock';
 import * as request from 'request';
-import { Readable } from 'stream';
+import {Readable} from 'stream';
 
-import { teenyRequest } from '../src';
+import {teenyRequest} from '../src';
 
 nock.disableNetConnect();
 const uri = 'http://example.com';
@@ -11,13 +11,13 @@ const uri = 'http://example.com';
 function mockJson() {
   return nock(uri)
     .get('/')
-    .reply(200, { hello: '🌍' });
+    .reply(200, {hello: '🌍'});
 }
 
 describe('teeny', () => {
   it('should get JSON', done => {
     const scope = mockJson();
-    teenyRequest({ uri }, (error, response, body) => {
+    teenyRequest({uri}, (error, response, body) => {
       assert.ifError(error);
       assert.strictEqual(response.statusCode, 200);
       assert.ok(body.hello);
@@ -28,8 +28,8 @@ describe('teeny', () => {
 
   it('should set defaults', done => {
     const scope = mockJson();
-    const defaultRequest = teenyRequest.defaults({ timeout: 60000 });
-    defaultRequest({ uri }, (error, response, body) => {
+    const defaultRequest = teenyRequest.defaults({timeout: 60000});
+    defaultRequest({uri}, (error, response, body) => {
       assert.ifError(error);
       assert.strictEqual(response.statusCode, 200);
       assert.ok(body.hello);
@@ -39,12 +39,12 @@ describe('teeny', () => {
   });
 
   it('response event emits object compatible with request module', done => {
-    const reqHeaders = { fruit: 'banana' };
-    const resHeaders = { veggies: 'carrots' };
+    const reqHeaders = {fruit: 'banana'};
+    const resHeaders = {veggies: 'carrots'};
     const scope = nock(uri)
       .get('/')
       .reply(202, 'ok', resHeaders);
-    const reqStream = teenyRequest({ uri, headers: reqHeaders });
+    const reqStream = teenyRequest({uri, headers: reqHeaders});
     reqStream
       .on('response', res => {
         assert.strictEqual(res.statusCode, 202);
@@ -65,9 +65,9 @@ describe('teeny', () => {
     const scope = nock(uri)
       .get(path)
       .reply(202);
-    const headers = { dinner: 'tacos' };
+    const headers = {dinner: 'tacos'};
     const url = `${uri}${path}`;
-    teenyRequest({ url, headers }, (error, response) => {
+    teenyRequest({url, headers}, (error, response) => {
       assert.ifError(error);
       const req = response.request;
       assert.deepStrictEqual(req.headers, headers);
@@ -80,8 +80,8 @@ describe('teeny', () => {
   it('should not wrap the error', done => {
     const scope = nock(uri)
       .get('/')
-      .reply(200, '🚨', { 'content-type': 'application/json' });
-    teenyRequest({ uri }, err => {
+      .reply(200, '🚨', {'content-type': 'application/json'});
+    teenyRequest({uri}, err => {
       assert.ok(err);
       assert.ok(err.message.match(/^invalid json response body/));
       scope.done();
@@ -90,12 +90,12 @@ describe('teeny', () => {
   });
 
   it('should include headers in the response', done => {
-    const headers = { dinner: 'tacos' };
-    const body = { hello: '🌍' };
+    const headers = {dinner: 'tacos'};
+    const body = {hello: '🌍'};
     const scope = nock(uri)
       .get('/')
       .reply(200, body, headers);
-    teenyRequest({ uri }, (err, res) => {
+    teenyRequest({uri}, (err, res) => {
       assert.ifError(err);
       assert.strictEqual(headers['dinner'], res.headers['dinner']);
       scope.done();

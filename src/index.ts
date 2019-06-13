@@ -1,6 +1,6 @@
 import * as r from 'request'; // Only for type declarations
 import fetch, * as f from 'node-fetch';
-import { PassThrough } from 'stream';
+import {PassThrough} from 'stream';
 import * as uuid from 'uuid';
 
 // tslint:disable-next-line variable-name
@@ -22,8 +22,8 @@ interface Headers {
 function requestToFetchOptions(reqOpts: r.Options) {
   const options: f.RequestInit = {
     method: reqOpts.method || 'GET',
-    ...(reqOpts.timeout && { timeout: reqOpts.timeout }),
-    ...(reqOpts.gzip && { compress: reqOpts.gzip }),
+    ...(reqOpts.timeout && {timeout: reqOpts.timeout}),
+    ...(reqOpts.gzip && {compress: reqOpts.gzip}),
   };
 
   if (typeof reqOpts.json === 'object') {
@@ -56,7 +56,7 @@ function requestToFetchOptions(reqOpts: r.Options) {
     options.agent = new HttpsProxyAgent(proxy);
   }
 
-  return { uri, options };
+  return {uri, options};
 }
 
 /**
@@ -80,7 +80,7 @@ function fetchToRequestResponse(opts: r.Options, res: f.Response) {
     request,
     body: res.body,
     headers: resHeaders,
-    toJSON: () => ({ headers: resHeaders }),
+    toJSON: () => ({headers: resHeaders}),
   });
 
   return response as r.Response;
@@ -98,7 +98,7 @@ function createMultipartStream(boundary: string, multipart: r.RequestPart[]) {
 
   for (const part of multipart) {
     const preamble = `--${boundary}\r\nContent-Type: ${
-      (part as { ['Content-Type']?: string })['Content-Type']
+      (part as {['Content-Type']?: string})['Content-Type']
     }\r\n\r\n`;
     stream.write(preamble);
     if (typeof part.body === 'string') {
@@ -107,7 +107,7 @@ function createMultipartStream(boundary: string, multipart: r.RequestPart[]) {
     } else {
       part.body.pipe(
         stream,
-        { end: false }
+        {end: false}
       );
       part.body.on('end', () => {
         stream.write('\r\n');
@@ -125,7 +125,7 @@ function teenyRequest(
   reqOpts: r.Options,
   callback?: r.RequestCallback
 ): r.Request | void {
-  const { uri, options } = requestToFetchOptions(reqOpts);
+  const {uri, options} = requestToFetchOptions(reqOpts);
 
   const multipart = reqOpts.multipart as r.RequestPart[];
   if (reqOpts.multipart && multipart.length === 2) {
@@ -253,7 +253,7 @@ teenyRequest.defaults = (defaults: r.OptionalUriUrl) => {
     reqOpts: r.Options,
     callback?: r.RequestCallback
   ): r.Request | void => {
-    const opts = { ...defaults, ...reqOpts };
+    const opts = {...defaults, ...reqOpts};
     if (callback === undefined) {
       return teenyRequest(opts);
     }
@@ -261,4 +261,4 @@ teenyRequest.defaults = (defaults: r.OptionalUriUrl) => {
   };
 };
 
-export { teenyRequest };
+export {teenyRequest};
