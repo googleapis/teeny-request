@@ -1,8 +1,6 @@
 import * as assert from 'assert';
 import * as nock from 'nock';
-import * as request from 'request';
 import {Readable} from 'stream';
-
 import {teenyRequest} from '../src';
 
 nock.disableNetConnect();
@@ -83,7 +81,7 @@ describe('teeny', () => {
       .reply(200, '🚨', {'content-type': 'application/json'});
     teenyRequest({uri}, err => {
       assert.ok(err);
-      assert.ok(err.message.match(/^invalid json response body/));
+      assert.ok(err!.message.match(/^invalid json response body/));
       scope.done();
       done();
     });
@@ -101,10 +99,5 @@ describe('teeny', () => {
       scope.done();
       done();
     });
-  });
-
-  it('should be castable to `Request`', () => {
-    const r = teenyRequest as typeof request;
-    assert.ok(r);
   });
 });
