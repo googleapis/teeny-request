@@ -8,7 +8,7 @@
     "test": "nyc mocha build/test",
     "compile": "tsc -p .",
     "pretest": "npm run compile",
-    "check": "gts check",
+    "lint": "gts check",
     "clean": "gts clean",
     "fix": "gts fix",
     "prepare": "npm run compile",
