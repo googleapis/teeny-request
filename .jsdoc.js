@@ -41,5 +41,8 @@ module.exports = {
     sourceFiles: false,
     systemName: 'teeny-request',
     theme: 'lumen'
+  },
+  markdown: {
+    idInHeadings: true
   }
 };
