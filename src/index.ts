@@ -2,30 +2,31 @@ import fetch, * as f from 'node-fetch';
 import {PassThrough, Readable, Duplex} from 'stream';
 import * as uuid from 'uuid';
 
-export interface CoreOptions<T = {}> {
+export interface CoreOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'HEAD' | 'OPTIONS';
   timeout?: number;
   gzip?: boolean;
-  json?: T;
+  // tslint:disable-next-line no-any
+  json?: any;
   headers?: Headers;
   body?: string | {};
   useQuerystring?: boolean;
-  qs?: {};
+  // tslint:disable-next-line no-any
+  qs?: any;
   proxy?: string;
-  uri?: string;
-  url?: string;
   multipart?: RequestPart[];
+  forever?: boolean;
 }
 
-export interface OptionsWithUri<T = {}> extends CoreOptions<T> {
+export interface OptionsWithUri extends CoreOptions {
   uri: string;
 }
 
-export interface OptionsWithUrl<T = {}> extends CoreOptions<T> {
+export interface OptionsWithUrl extends CoreOptions {
   url: string;
 }
 
-export type Options<T = {}> = OptionsWithUri<T> | OptionsWithUrl<T>;
+export type Options = OptionsWithUri | OptionsWithUrl;
 
 export interface Request extends Duplex {
   headers: Headers;
@@ -38,6 +39,7 @@ export interface Response<T = any> {
   headers: Headers;
   body: T;
   request: Request;
+  statusMessage?: string;
 }
 
 export interface RequestPart {
