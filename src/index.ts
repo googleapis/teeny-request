@@ -1,3 +1,4 @@
+import {Agent} from 'https';
 import fetch, * as f from 'node-fetch';
 import {PassThrough, Readable, Duplex} from 'stream';
 import * as uuid from 'uuid';
@@ -102,6 +103,8 @@ function requestToFetchOptions(reqOpts: Options) {
   if (reqOpts.proxy || process.env.HTTP_PROXY || process.env.HTTPS_PROXY) {
     const proxy = (process.env.HTTP_PROXY || process.env.HTTPS_PROXY)!;
     options.agent = new HttpsProxyAgent(proxy);
+  } else if (reqOpts.forever) {
+    options.agent = new Agent({keepAlive: true});
   }
 
   return {uri, options};
