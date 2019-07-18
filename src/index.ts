@@ -17,6 +17,7 @@ export interface CoreOptions {
   proxy?: string;
   multipart?: RequestPart[];
   forever?: boolean;
+  agent?: Agent;
 }
 
 export interface OptionsWithUri extends CoreOptions {
@@ -30,6 +31,7 @@ export interface OptionsWithUrl extends CoreOptions {
 export type Options = OptionsWithUri | OptionsWithUrl;
 
 export interface Request extends Duplex {
+  agent: Agent | false;
   headers: Headers;
   href?: string;
 }
@@ -117,9 +119,10 @@ function requestToFetchOptions(reqOpts: Options) {
  * @param res The Fetch response
  * @returns A `request` response object
  */
-function fetchToRequestResponse(opts: Options, res: f.Response) {
+function fetchToRequestResponse(opts: f.RequestInit, res: f.Response) {
   const request = {} as Request;
-  request.headers = opts.headers || {};
+  request.agent = (opts.agent as Agent) || false;
+  request.headers = (opts.headers || {}) as Headers;
   request.href = res.url;
   // headers need to be converted from a map to an obj
   const resHeaders = {} as Headers;
@@ -194,7 +197,7 @@ function teenyRequest(
     fetch(uri, options).then(
       res => {
         const header = res.headers.get('content-type');
-        const response = fetchToRequestResponse(reqOpts, res);
+        const response = fetchToRequestResponse(options, res);
         const body = response.body;
         if (
           header === 'application/json' ||
@@ -240,7 +243,7 @@ function teenyRequest(
           requestStream.emit('error', err);
         });
 
-        const response = fetchToRequestResponse(reqOpts, res);
+        const response = fetchToRequestResponse(options, res);
         requestStream.emit('response', response);
       },
       err => {
@@ -258,7 +261,7 @@ function teenyRequest(
   fetch(uri, options).then(
     res => {
       const header = res.headers.get('content-type');
-      const response = fetchToRequestResponse(reqOpts, res);
+      const response = fetchToRequestResponse(options, res);
       const body = response.body;
       if (
         header === 'application/json' ||
@@ -283,7 +286,7 @@ function teenyRequest(
 
       res.text().then(
         text => {
-          const response = fetchToRequestResponse(reqOpts, res);
+          const response = fetchToRequestResponse(options, res);
           response.body = text;
           callback(null, response, text);
         },

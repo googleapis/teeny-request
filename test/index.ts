@@ -100,4 +100,17 @@ describe('teeny', () => {
       done();
     });
   });
+
+  it('should accept the forever option', done => {
+    const scope = nock(uri)
+      .get('/')
+      .reply(200);
+    teenyRequest({uri, forever: true}, (err, res) => {
+      assert.ifError(err);
+      // tslint:disable-next-line no-any
+      assert.strictEqual((res.request.agent as any).keepAlive, true);
+      scope.done();
+      done();
+    });
+  });
 });
