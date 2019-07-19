@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.0](https://www.github.com/googleapis/teeny-request/compare/v5.0.0...v5.1.0) (2019-07-19)
+
+
+### Features
+
+* support forever option ([#54](https://www.github.com/googleapis/teeny-request/issues/54)) ([746d70e](https://www.github.com/googleapis/teeny-request/commit/746d70e))
+
 ## [5.0.0](https://www.github.com/googleapis/teeny-request/compare/v4.0.0...v5.0.0) (2019-07-15)
 
 
