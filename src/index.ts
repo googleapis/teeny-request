@@ -17,7 +17,6 @@ export interface CoreOptions {
   proxy?: string;
   multipart?: RequestPart[];
   forever?: boolean;
-  agent?: Agent;
 }
 
 export interface OptionsWithUri extends CoreOptions {
