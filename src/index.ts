@@ -101,8 +101,12 @@ function requestToFetchOptions(reqOpts: Options) {
     uri = uri + '?' + params;
   }
 
-  if (reqOpts.proxy || process.env.HTTP_PROXY || process.env.HTTPS_PROXY) {
-    const proxy = (process.env.HTTP_PROXY || process.env.HTTPS_PROXY)!;
+  const proxy =
+    process.env.HTTP_PROXY ||
+    process.env.http_proxy ||
+    process.env.HTTPS_PROXY ||
+    process.env.https_proxy;
+  if (reqOpts.proxy || proxy) {
     options.agent = new HttpsProxyAgent(proxy);
   } else if (reqOpts.forever) {
     options.agent = new Agent({keepAlive: true});
