@@ -1,7 +1,11 @@
 import * as assert from 'assert';
 import * as nock from 'nock';
 import {Readable} from 'stream';
+import * as sinon from 'sinon';
 import {teenyRequest} from '../src';
+
+// tslint:disable-next-line variable-name
+const HttpsProxyAgent = require('https-proxy-agent');
 
 nock.disableNetConnect();
 const uri = 'http://example.com';
@@ -13,6 +17,12 @@ function mockJson() {
 }
 
 describe('teeny', () => {
+  const sandbox = sinon.createSandbox();
+  afterEach(() => {
+    sandbox.restore();
+    nock.cleanAll();
+  });
+
   it('should get JSON', done => {
     const scope = mockJson();
     teenyRequest({uri}, (error, response, body) => {
@@ -112,5 +122,22 @@ describe('teeny', () => {
       scope.done();
       done();
     });
+  });
+
+  it('should respect environment variables for proxy config', () => {
+    const envVars = ['http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY'];
+    for (const v of envVars) {
+      sandbox.stub(process, 'env').value({[v]: 'https://fake.proxy'});
+      const expectedBody = {hello: '🌎'};
+      const scope = nock(uri)
+        .get('/')
+        .reply(200, expectedBody);
+      teenyRequest({uri}, (err, res, body) => {
+        assert.ifError(err);
+        scope.done();
+        assert.deepStrictEqual(expectedBody, body);
+        assert.ok(res.request.agent instanceof HttpsProxyAgent);
+      });
+    }
   });
 });
