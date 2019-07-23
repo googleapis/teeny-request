@@ -1,5 +1,12 @@
 # Changelog
 
+### [5.1.1](https://www.github.com/googleapis/teeny-request/compare/v5.1.0...v5.1.1) (2019-07-23)
+
+
+### Bug Fixes
+
+* support lowercase proxy env vars ([#56](https://www.github.com/googleapis/teeny-request/issues/56)) ([0b3e433](https://www.github.com/googleapis/teeny-request/commit/0b3e433))
+
 ## [5.1.0](https://www.github.com/googleapis/teeny-request/compare/v5.0.0...v5.1.0) (2019-07-19)
 
 
