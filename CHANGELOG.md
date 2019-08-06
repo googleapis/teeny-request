@@ -1,5 +1,12 @@
 # Changelog
 
+### [5.1.2](https://www.github.com/googleapis/teeny-request/compare/v5.1.1...v5.1.2) (2019-08-06)
+
+
+### Bug Fixes
+
+* **types:** expand method and header types ([#61](https://www.github.com/googleapis/teeny-request/issues/61)) ([c04d2f1](https://www.github.com/googleapis/teeny-request/commit/c04d2f1))
+
 ### [5.1.1](https://www.github.com/googleapis/teeny-request/compare/v5.1.0...v5.1.1) (2019-07-23)
 
 
