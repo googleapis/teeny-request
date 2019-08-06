@@ -20,7 +20,17 @@ import {PassThrough, Readable, Duplex} from 'stream';
 import * as uuid from 'uuid';
 
 export interface CoreOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'HEAD' | 'OPTIONS';
+  method?:
+    | 'GET'
+    | 'POST'
+    | 'PUT'
+    | 'HEAD'
+    | 'OPTIONS'
+    | 'PATCH'
+    | 'DELETE'
+    | 'CONNECT'
+    | 'OPTIONS'
+    | 'TRACE';
   timeout?: number;
   gzip?: boolean;
   // tslint:disable-next-line no-any
@@ -77,7 +87,7 @@ export class RequestError extends Error {
 }
 
 interface Headers {
-  [index: string]: string;
+  [index: string]: string | undefined;
 }
 
 /**
@@ -107,7 +117,8 @@ function requestToFetchOptions(reqOpts: Options) {
     }
   }
 
-  options.headers = reqOpts.headers as Headers;
+  // tslint:disable-next-line no-any
+  options.headers = reqOpts.headers as any;
 
   let uri = ((reqOpts as OptionsWithUri).uri ||
     (reqOpts as OptionsWithUrl).url) as string;
