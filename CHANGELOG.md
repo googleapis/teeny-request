@@ -1,5 +1,12 @@
 # Changelog
 
+### [5.1.3](https://www.github.com/googleapis/teeny-request/compare/v5.1.2...v5.1.3) (2019-08-06)
+
+
+### Bug Fixes
+
+* duplex stream does not implement methods like _read ([#64](https://www.github.com/googleapis/teeny-request/issues/64)) ([22ee26c](https://www.github.com/googleapis/teeny-request/commit/22ee26c))
+
 ### [5.1.2](https://www.github.com/googleapis/teeny-request/compare/v5.1.1...v5.1.2) (2019-08-06)
 
 
