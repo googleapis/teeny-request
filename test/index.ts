@@ -167,10 +167,9 @@ describe('teeny', () => {
 
   it('should emit response event when called without callback', done => {
     const scope = mockJson();
-    teenyRequest({uri})
-      .on('response', res => {
-        assert.ok(res);
-        return done();
-      })
+    teenyRequest({uri}).on('response', res => {
+      assert.ok(res);
+      return done();
+    });
   });
 });
