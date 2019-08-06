@@ -16,7 +16,7 @@
 
 import {Agent} from 'https';
 import fetch, * as f from 'node-fetch';
-import {PassThrough, Readable, Duplex} from 'stream';
+import {PassThrough, Readable} from 'stream';
 import * as uuid from 'uuid';
 
 export interface CoreOptions {
@@ -55,7 +55,7 @@ export interface OptionsWithUrl extends CoreOptions {
 
 export type Options = OptionsWithUri | OptionsWithUrl;
 
-export interface Request extends Duplex {
+export interface Request extends PassThrough {
   agent: Agent | false;
   headers: Headers;
   href?: string;
@@ -264,7 +264,7 @@ function teenyRequest(
 
   if (callback === undefined) {
     // Stream mode
-    const requestStream = new Duplex();
+    const requestStream = new PassThrough();
     options.compress = false;
     fetch(uri, options).then(
       res => {

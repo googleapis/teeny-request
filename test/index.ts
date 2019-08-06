@@ -20,6 +20,8 @@ import {Readable} from 'stream';
 import * as sinon from 'sinon';
 import {teenyRequest} from '../src';
 
+import {PassThrough} from 'stream';
+
 // tslint:disable-next-line variable-name
 const HttpsProxyAgent = require('https-proxy-agent');
 
@@ -155,5 +157,19 @@ describe('teeny', () => {
         assert.ok(res.request.agent instanceof HttpsProxyAgent);
       });
     }
+  });
+
+  // see: https://github.com/googleapis/nodejs-storage/issues/798
+  it('should not throw exception when piped through pumpify', () => {
+    const scope = mockJson();
+    teenyRequest({uri}).pipe(new PassThrough());
+  });
+
+  it('should emit response event when called without callback', done => {
+    const scope = mockJson();
+    teenyRequest({uri}).on('response', res => {
+      assert.ok(res);
+      return done();
+    });
   });
 });
