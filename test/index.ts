@@ -165,4 +165,12 @@ describe('teeny', () => {
     const scope = mockJson();
     teenyRequest({uri}).pipe(pipe);
   });
+
+  it('should emit response event when called without callback', done => {
+    const scope = mockJson();
+    teenyRequest({uri}).on('response', res => {
+      assert.ok(res);
+      return done();
+    });
+  });
 });
