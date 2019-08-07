@@ -215,7 +215,7 @@ function teenyRequest(
   const multipart = reqOpts.multipart as RequestPart[];
   if (reqOpts.multipart && multipart.length === 2) {
     if (!callback) {
-      console.log('Error, multipart without callback not implemented.');
+      console.error('multipart without callback not implemented.');
       return;
     }
     const boundary: string = uuid.v4();
@@ -271,7 +271,6 @@ function teenyRequest(
       res => {
         res.body
           .on('error', err => {
-            console.log('whoa there was an error, passing it on: ' + err);
             requestStream.emit('error', err);
           })
           .pipe(requestStream);
@@ -280,7 +279,6 @@ function teenyRequest(
         requestStream.emit('response', response);
       },
       err => {
-        console.log('such a nice error:' + err);
         requestStream.emit('error', err);
       }
     );
