@@ -87,7 +87,7 @@ export class RequestError extends Error {
 }
 
 interface Headers {
-  [index: string]: string | undefined;
+  [index: string]: string;
 }
 
 /**
