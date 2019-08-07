@@ -87,7 +87,8 @@ export class RequestError extends Error {
 }
 
 interface Headers {
-  [index: string]: string;
+  // tslint:disable-next-line no-any
+  [index: string]: any;
 }
 
 /**
