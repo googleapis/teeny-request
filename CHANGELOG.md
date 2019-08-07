@@ -1,5 +1,12 @@
 # Changelog
 
+### [5.1.4](https://www.github.com/googleapis/teeny-request/compare/v5.1.3...v5.1.4) (2019-08-07)
+
+
+### Bug Fixes
+
+* undefined headers breaks compatibility with auth ([#66](https://www.github.com/googleapis/teeny-request/issues/66)) ([12901a0](https://www.github.com/googleapis/teeny-request/commit/12901a0))
+
 ### [5.1.3](https://www.github.com/googleapis/teeny-request/compare/v5.1.2...v5.1.3) (2019-08-06)
 
 
