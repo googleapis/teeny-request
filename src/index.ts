@@ -269,11 +269,9 @@ function teenyRequest(
     options.compress = false;
     fetch(uri, options).then(
       res => {
-        res.body
-          .on('error', err => {
-            requestStream.emit('error', err);
-          })
-          .pipe(requestStream);
+        res.body.on('error', err => {
+          requestStream.emit('error', err);
+        });
 
         const response = fetchToRequestResponse(options, res);
         requestStream.emit('response', response);
