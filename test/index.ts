@@ -172,15 +172,4 @@ describe('teeny', () => {
       return done();
     });
   });
-
-  it('should provide a readable stream', done => {
-    const scope = mockJson();
-    teenyRequest({uri})
-      .on('error', done)
-      .on('data', data => {
-        const json = JSON.parse(data.toString());
-        assert.deepStrictEqual(json, {hello: '🌍'});
-        done();
-      });
-  });
 });
