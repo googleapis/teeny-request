@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+import {Agent as HTTPAgent} from 'http';
 import {Agent} from 'https';
+
 import fetch, * as f from 'node-fetch';
 import {PassThrough, Readable} from 'stream';
 import * as uuid from 'uuid';
@@ -136,9 +138,12 @@ function requestToFetchOptions(reqOpts: Options) {
     process.env.HTTPS_PROXY ||
     process.env.https_proxy;
   if (reqOpts.proxy || proxy) {
+    // TODO: we should support an HTTP proxy.
     options.agent = new HttpsProxyAgent(proxy);
   } else if (reqOpts.forever) {
-    options.agent = new Agent({keepAlive: true});
+    options.agent = /^http:\/\//.test(uri)
+      ? new HTTPAgent({keepAlive: true})
+      : new Agent({keepAlive: true});
   }
 
   return {uri, options};
