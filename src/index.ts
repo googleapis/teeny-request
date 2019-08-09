@@ -18,6 +18,7 @@ import {Agent} from 'https';
 import fetch, * as f from 'node-fetch';
 import {PassThrough, Readable} from 'stream';
 import * as uuid from 'uuid';
+const streamEvents = require('stream-events');
 
 export interface CoreOptions {
   method?:
@@ -265,11 +266,24 @@ function teenyRequest(
 
   if (callback === undefined) {
     // Stream mode
-    const requestStream = new PassThrough();
+    const requestStream = streamEvents(new PassThrough());
+    // tslint:disable-next-line no-any
+    let responseStream: any;
+    requestStream.once('reading', () => {
+      if (responseStream) {
+        responseStream.pipe(requestStream);
+      } else {
+        requestStream.once('response', () => {
+          responseStream.pipe(requestStream);
+        });
+      }
+    });
     options.compress = false;
     fetch(uri, options).then(
       res => {
-        res.body.on('error', err => {
+        responseStream = res.body;
+
+        responseStream.on('error', (err: Error) => {
           requestStream.emit('error', err);
         });
 

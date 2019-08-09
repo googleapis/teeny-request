@@ -172,4 +172,26 @@ describe('teeny', () => {
       return done();
     });
   });
+
+  it('should pipe response stream to user', done => {
+    const scope = mockJson();
+    teenyRequest({uri})
+      .on('error', done)
+      .on('data', () => {
+        done();
+      });
+  });
+
+  it('should not pipe response stream to user unless they ask for it', done => {
+    const scope = mockJson();
+    const stream = teenyRequest({uri}).on('error', done);
+    stream.on('response', responseStream => {
+      assert.strictEqual(responseStream.body._readableState.pipesCount, 0);
+
+      stream.on('data', () => {
+        assert.strictEqual(responseStream.body._readableState.pipesCount, 1);
+        done();
+      });
+    });
+  });
 });
