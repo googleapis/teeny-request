@@ -26,7 +26,7 @@ import {PassThrough} from 'stream';
 const HttpsProxyAgent = require('https-proxy-agent');
 
 nock.disableNetConnect();
-const uri = 'http://example.com';
+const uri = 'https://example.com';
 
 function mockJson() {
   return nock(uri)
@@ -142,22 +142,23 @@ describe('teeny', () => {
     });
   });
 
-  it('should respect environment variables for proxy config', () => {
-    const envVars = ['http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY'];
-    for (const v of envVars) {
+  const envVars = ['http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY'];
+  for (const v of envVars) {
+    it('should respect environment variables for proxy config', done => {
       sandbox.stub(process, 'env').value({[v]: 'https://fake.proxy'});
       const expectedBody = {hello: '🌎'};
       const scope = nock(uri)
         .get('/')
         .reply(200, expectedBody);
       teenyRequest({uri}, (err, res, body) => {
-        assert.ifError(err);
         scope.done();
+        assert.ifError(err);
         assert.deepStrictEqual(expectedBody, body);
         assert.ok(res.request.agent instanceof HttpsProxyAgent);
+        return done();
       });
-    }
-  });
+    });
+  }
 
   // see: https://github.com/googleapis/nodejs-storage/issues/798
   it('should not throw exception when piped through pumpify', () => {

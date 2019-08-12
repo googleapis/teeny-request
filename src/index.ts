@@ -83,6 +83,8 @@ export interface RequestCallback<T = any> {
 }
 
 // tslint:disable-next-line variable-name
+const HttpProxyAgent = require('http-proxy-agent');
+// tslint:disable-next-line variable-name
 const HttpsProxyAgent = require('https-proxy-agent');
 
 export class RequestError extends Error {
@@ -136,10 +138,12 @@ function requestToFetchOptions(reqOpts: Options) {
     process.env.HTTP_PROXY ||
     process.env.http_proxy ||
     process.env.HTTPS_PROXY ||
-    process.env.https_proxy;
-  if (reqOpts.proxy || proxy) {
-    // TODO: we should support an HTTP proxy.
-    options.agent = new HttpsProxyAgent(proxy);
+    process.env.https_proxy ||
+    reqOpts.proxy;
+  if (proxy) {
+    options.agent = /^http:\/\//.test(uri)
+      ? new HttpProxyAgent(proxy)
+      : new HttpsProxyAgent(proxy);
   } else if (reqOpts.forever) {
     options.agent = /^http:\/\//.test(uri)
       ? new HTTPAgent({keepAlive: true})
