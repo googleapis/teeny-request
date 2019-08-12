@@ -134,6 +134,7 @@ function requestToFetchOptions(reqOpts: Options) {
     uri = uri + '?' + params;
   }
 
+  const isHttp = /^http:\/\//.test(uri);
   const proxy =
     reqOpts.proxy ||
     process.env.HTTP_PROXY ||
@@ -141,11 +142,11 @@ function requestToFetchOptions(reqOpts: Options) {
     process.env.HTTPS_PROXY ||
     process.env.https_proxy;
   if (proxy) {
-    options.agent = /^http:\/\//.test(uri)
+    options.agent = isHttp
       ? new HttpProxyAgent(proxy)
       : new HttpsProxyAgent(proxy);
   } else if (reqOpts.forever) {
-    options.agent = /^http:\/\//.test(uri)
+    options.agent = isHttp
       ? new HTTPAgent({keepAlive: true})
       : new Agent({keepAlive: true});
   }
