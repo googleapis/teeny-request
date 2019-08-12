@@ -144,7 +144,7 @@ describe('teeny', () => {
 
   const envVars = ['http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY'];
   for (const v of envVars) {
-    it('should respect environment variables for proxy config', done => {
+    it(`should respect ${v} environment variable for proxy config`, done => {
       sandbox.stub(process, 'env').value({[v]: 'https://fake.proxy'});
       const expectedBody = {hello: '🌎'};
       const scope = nock(uri)
@@ -159,6 +159,20 @@ describe('teeny', () => {
       });
     });
   }
+
+  it('should use proxy if set in request options', done => {
+    const expectedBody = {hello: '🌎'};
+    const scope = nock(uri)
+      .get('/')
+      .reply(200, expectedBody);
+    teenyRequest({uri, proxy: 'https://fake.proxy'}, (err, res, body) => {
+      scope.done();
+      assert.ifError(err);
+      assert.deepStrictEqual(expectedBody, body);
+      assert.ok(res.request.agent instanceof HttpsProxyAgent);
+      return done();
+    });
+  });
 
   // see: https://github.com/googleapis/nodejs-storage/issues/798
   it('should not throw exception when piped through pumpify', () => {
