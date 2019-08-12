@@ -135,11 +135,11 @@ function requestToFetchOptions(reqOpts: Options) {
   }
 
   const proxy =
+    reqOpts.proxy ||
     process.env.HTTP_PROXY ||
     process.env.http_proxy ||
     process.env.HTTPS_PROXY ||
-    process.env.https_proxy ||
-    reqOpts.proxy;
+    process.env.https_proxy;
   if (proxy) {
     options.agent = /^http:\/\//.test(uri)
       ? new HttpProxyAgent(proxy)
