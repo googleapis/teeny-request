@@ -1,5 +1,25 @@
 # Changelog
 
+## [5.2.0](https://www.github.com/googleapis/teeny-request/compare/v5.1.3...v5.2.0) (2019-08-13)
+
+
+### Bug Fixes
+
+* if scheme is http:// use an HTTP agent ([#75](https://www.github.com/googleapis/teeny-request/issues/75)) ([abdf846](https://www.github.com/googleapis/teeny-request/commit/abdf846))
+* remove unused logging ([#71](https://www.github.com/googleapis/teeny-request/issues/71)) ([4cb4967](https://www.github.com/googleapis/teeny-request/commit/4cb4967))
+* undefined headers breaks compatibility with auth ([#66](https://www.github.com/googleapis/teeny-request/issues/66)) ([12901a0](https://www.github.com/googleapis/teeny-request/commit/12901a0))
+
+
+### Features
+
+* support lazy-reading from response stream ([#74](https://www.github.com/googleapis/teeny-request/issues/74)) ([f6db420](https://www.github.com/googleapis/teeny-request/commit/f6db420))
+* support reading from the request stream ([#67](https://www.github.com/googleapis/teeny-request/issues/67)) ([ae23054](https://www.github.com/googleapis/teeny-request/commit/ae23054))
+
+
+### Reverts
+
+* do not pipe fetch response into user stream ([#72](https://www.github.com/googleapis/teeny-request/issues/72)) ([6ec812e](https://www.github.com/googleapis/teeny-request/commit/6ec812e))
+
 ### [5.1.3](https://www.github.com/googleapis/teeny-request/compare/v5.1.2...v5.1.3) (2019-08-06)
 
 
