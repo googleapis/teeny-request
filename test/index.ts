@@ -23,10 +23,12 @@ import {teenyRequest} from '../src';
 import {PassThrough} from 'stream';
 
 // tslint:disable-next-line variable-name
+const HttpProxyAgent = require('http-proxy-agent');
+// tslint:disable-next-line variable-name
 const HttpsProxyAgent = require('https-proxy-agent');
 
 nock.disableNetConnect();
-const uri = 'http://example.com';
+const uri = 'https://example.com';
 
 function mockJson() {
   return nock(uri)
@@ -142,21 +144,51 @@ describe('teeny', () => {
     });
   });
 
-  it('should respect environment variables for proxy config', () => {
-    const envVars = ['http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY'];
-    for (const v of envVars) {
+  const envVars = ['http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY'];
+  for (const v of envVars) {
+    it(`should respect ${v} environment variable for proxy config`, done => {
       sandbox.stub(process, 'env').value({[v]: 'https://fake.proxy'});
       const expectedBody = {hello: '🌎'};
       const scope = nock(uri)
         .get('/')
         .reply(200, expectedBody);
       teenyRequest({uri}, (err, res, body) => {
-        assert.ifError(err);
         scope.done();
+        assert.ifError(err);
         assert.deepStrictEqual(expectedBody, body);
         assert.ok(res.request.agent instanceof HttpsProxyAgent);
+        return done();
       });
-    }
+    });
+  }
+
+  it('should create http proxy if upstream scheme is http', done => {
+    sandbox.stub(process, 'env').value({http_proxy: 'https://fake.proxy'});
+    const expectedBody = {hello: '🌎'};
+    const scope = nock('http://example.com')
+      .get('/')
+      .reply(200, expectedBody);
+    teenyRequest({uri: 'http://example.com'}, (err, res, body) => {
+      scope.done();
+      assert.ifError(err);
+      assert.deepStrictEqual(expectedBody, body);
+      assert.ok(res.request.agent instanceof HttpProxyAgent);
+      return done();
+    });
+  });
+
+  it('should use proxy if set in request options', done => {
+    const expectedBody = {hello: '🌎'};
+    const scope = nock(uri)
+      .get('/')
+      .reply(200, expectedBody);
+    teenyRequest({uri, proxy: 'https://fake.proxy'}, (err, res, body) => {
+      scope.done();
+      assert.ifError(err);
+      assert.deepStrictEqual(expectedBody, body);
+      assert.ok(res.request.agent instanceof HttpsProxyAgent);
+      return done();
+    });
   });
 
   // see: https://github.com/googleapis/nodejs-storage/issues/798

@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+import {Agent as HTTPAgent} from 'http';
 import {Agent} from 'https';
+
 import fetch, * as f from 'node-fetch';
 import {PassThrough, Readable} from 'stream';
 import * as uuid from 'uuid';
@@ -80,9 +82,6 @@ export interface RequestCallback<T = any> {
   (err: Error | null, response: Response, body?: T): void;
 }
 
-// tslint:disable-next-line variable-name
-const HttpsProxyAgent = require('https-proxy-agent');
-
 export class RequestError extends Error {
   code?: number;
 }
@@ -130,15 +129,27 @@ function requestToFetchOptions(reqOpts: Options) {
     uri = uri + '?' + params;
   }
 
+  const isHttp = uri.startsWith('http://');
   const proxy =
+    reqOpts.proxy ||
     process.env.HTTP_PROXY ||
     process.env.http_proxy ||
     process.env.HTTPS_PROXY ||
     process.env.https_proxy;
-  if (reqOpts.proxy || proxy) {
-    options.agent = new HttpsProxyAgent(proxy);
+  if (proxy) {
+    if (isHttp) {
+      // tslint:disable-next-line variable-name
+      const HttpProxyAgent = require('http-proxy-agent');
+      options.agent = new HttpProxyAgent(proxy);
+    } else {
+      // tslint:disable-next-line variable-name
+      const HttpsProxyAgent = require('https-proxy-agent');
+      options.agent = new HttpsProxyAgent(proxy);
+    }
   } else if (reqOpts.forever) {
-    options.agent = new Agent({keepAlive: true});
+    options.agent = isHttp
+      ? new HTTPAgent({keepAlive: true})
+      : new Agent({keepAlive: true});
   }
 
   return {uri, options};
