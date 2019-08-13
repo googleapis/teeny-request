@@ -23,6 +23,8 @@ import {teenyRequest} from '../src';
 import {PassThrough} from 'stream';
 
 // tslint:disable-next-line variable-name
+const HttpProxyAgent = require('http-proxy-agent');
+// tslint:disable-next-line variable-name
 const HttpsProxyAgent = require('https-proxy-agent');
 
 nock.disableNetConnect();
@@ -159,6 +161,21 @@ describe('teeny', () => {
       });
     });
   }
+
+  it('should create http proxy if upstream scheme is http', done => {
+    sandbox.stub(process, 'env').value({http_proxy: 'https://fake.proxy'});
+    const expectedBody = {hello: '🌎'};
+    const scope = nock('http://example.com')
+      .get('/')
+      .reply(200, expectedBody);
+    teenyRequest({uri: 'http://example.com'}, (err, res, body) => {
+      scope.done();
+      assert.ifError(err);
+      assert.deepStrictEqual(expectedBody, body);
+      assert.ok(res.request.agent instanceof HttpProxyAgent);
+      return done();
+    });
+  });
 
   it('should use proxy if set in request options', done => {
     const expectedBody = {hello: '🌎'};

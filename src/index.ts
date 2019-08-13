@@ -82,11 +82,6 @@ export interface RequestCallback<T = any> {
   (err: Error | null, response: Response, body?: T): void;
 }
 
-// tslint:disable-next-line variable-name
-const HttpProxyAgent = require('http-proxy-agent');
-// tslint:disable-next-line variable-name
-const HttpsProxyAgent = require('https-proxy-agent');
-
 export class RequestError extends Error {
   code?: number;
 }
@@ -134,7 +129,7 @@ function requestToFetchOptions(reqOpts: Options) {
     uri = uri + '?' + params;
   }
 
-  const isHttp = /^http:\/\//.test(uri);
+  const isHttp = uri.startsWith('http://');
   const proxy =
     reqOpts.proxy ||
     process.env.HTTP_PROXY ||
@@ -142,9 +137,15 @@ function requestToFetchOptions(reqOpts: Options) {
     process.env.HTTPS_PROXY ||
     process.env.https_proxy;
   if (proxy) {
-    options.agent = isHttp
-      ? new HttpProxyAgent(proxy)
-      : new HttpsProxyAgent(proxy);
+    if (isHttp) {
+      // tslint:disable-next-line variable-name
+      const HttpProxyAgent = require('http-proxy-agent');
+      options.agent = new HttpProxyAgent(proxy);
+    } else {
+      // tslint:disable-next-line variable-name
+      const HttpsProxyAgent = require('https-proxy-agent');
+      options.agent = new HttpsProxyAgent(proxy);
+    }
   } else if (reqOpts.forever) {
     options.agent = isHttp
       ? new HTTPAgent({keepAlive: true})
