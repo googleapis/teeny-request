@@ -23,17 +23,7 @@ import * as uuid from 'uuid';
 const streamEvents = require('stream-events');
 
 export interface CoreOptions {
-  method?:
-    | 'GET'
-    | 'POST'
-    | 'PUT'
-    | 'HEAD'
-    | 'OPTIONS'
-    | 'PATCH'
-    | 'DELETE'
-    | 'CONNECT'
-    | 'OPTIONS'
-    | 'TRACE';
+  method?: string;
   timeout?: number;
   gzip?: boolean;
   // tslint:disable-next-line no-any
