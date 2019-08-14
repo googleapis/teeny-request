@@ -1,5 +1,12 @@
 # Changelog
 
+### [5.2.1](https://www.github.com/googleapis/teeny-request/compare/v5.2.0...v5.2.1) (2019-08-14)
+
+
+### Bug Fixes
+
+* **types:** make types less strict for method ([#76](https://www.github.com/googleapis/teeny-request/issues/76)) ([9f07e98](https://www.github.com/googleapis/teeny-request/commit/9f07e98))
+
 ## [5.2.0](https://www.github.com/googleapis/teeny-request/compare/v5.1.3...v5.2.0) (2019-08-13)
 
 
