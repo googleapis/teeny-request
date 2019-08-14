@@ -1,5 +1,5 @@
 /*!
- * Copyright 2018 Google LLC. All Rights Reserved.
+ * Copyright 2018 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,17 +23,7 @@ import * as uuid from 'uuid';
 const streamEvents = require('stream-events');
 
 export interface CoreOptions {
-  method?:
-    | 'GET'
-    | 'POST'
-    | 'PUT'
-    | 'HEAD'
-    | 'OPTIONS'
-    | 'PATCH'
-    | 'DELETE'
-    | 'CONNECT'
-    | 'OPTIONS'
-    | 'TRACE';
+  method?: string;
   timeout?: number;
   gzip?: boolean;
   // tslint:disable-next-line no-any
