@@ -37,19 +37,18 @@ export function getAgent(uri: string, reqOpts: Options): HTTPAgent | undefined {
     process.env.HTTPS_PROXY ||
     process.env.https_proxy;
 
+  if (proxy) {
+    // tslint:disable-next-line variable-name
+    const Agent = isHttp
+      ? require('http-proxy-agent')
+      : require('https-proxy-agent');
+
+    return new Agent(proxy) as HTTPAgent;
+  }
+
   let key = isHttp ? 'http' : 'https';
 
-  if (proxy) {
-    key += `:proxy:${proxy}`;
-
-    if (!pool.has(key)) {
-      // tslint:disable-next-line variable-name
-      const Agent = isHttp
-        ? require('http-proxy-agent')
-        : require('https-proxy-agent');
-      pool.set(key, new Agent(proxy) as HTTPAgent);
-    }
-  } else if (reqOpts.forever) {
+  if (reqOpts.forever) {
     key += ':forever';
 
     if (!pool.has(key)) {
