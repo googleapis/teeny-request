@@ -1,5 +1,12 @@
 # Changelog
 
+### [5.2.2](https://www.github.com/googleapis/teeny-request/compare/v5.2.1...v5.2.2) (2019-10-09)
+
+
+### Bug Fixes
+
+* **deps:** update dependency https-proxy-agent to v3 ([#89](https://www.github.com/googleapis/teeny-request/issues/89)) ([dfd52cc](https://www.github.com/googleapis/teeny-request/commit/dfd52cc))
+
 ### [5.2.1](https://www.github.com/googleapis/teeny-request/compare/v5.2.0...v5.2.1) (2019-08-14)
 
 
