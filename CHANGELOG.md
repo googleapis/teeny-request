@@ -1,5 +1,12 @@
 # Changelog
 
+### [5.3.1](https://www.github.com/googleapis/teeny-request/compare/v5.3.0...v5.3.1) (2019-10-29)
+
+
+### Bug Fixes
+
+* correctly set compress/gzip option when false ([#95](https://www.github.com/googleapis/teeny-request/issues/95)) ([72ef307](https://www.github.com/googleapis/teeny-request/commit/72ef307364de542af3ef8581572b1897fca2bcf4))
+
 ## [5.3.0](https://www.github.com/googleapis/teeny-request/compare/v5.2.1...v5.3.0) (2019-10-09)
 
 
