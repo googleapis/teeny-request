@@ -144,6 +144,36 @@ describe('teeny', () => {
     });
   });
 
+  it('should allow setting compress/gzip to true', done => {
+    const reqheaders = {
+      'Accept-Encoding': 'gzip,deflate',
+    };
+
+    const scope = nock(uri, {reqheaders})
+      .get('/')
+      .reply(200);
+
+    teenyRequest({uri, gzip: true}, (err, res) => {
+      assert.ifError(err);
+      scope.done();
+      done();
+    });
+  });
+
+  it('should allow setting compress/gzip to false', done => {
+    const badheaders = ['Accept-Encoding'];
+
+    const scope = nock(uri, {badheaders})
+      .get('/')
+      .reply(200);
+
+    teenyRequest({uri, gzip: false}, (err, res) => {
+      assert.ifError(err);
+      scope.done();
+      done();
+    });
+  });
+
   const envVars = ['http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY'];
   for (const v of envVars) {
     it(`should respect ${v} environment variable for proxy config`, done => {
