@@ -170,10 +170,7 @@ function createMultipartStream(boundary: string, multipart: RequestPart[]) {
       stream.write(part.body);
       stream.write('\r\n');
     } else {
-      part.body.pipe(
-        stream,
-        {end: false}
-      );
+      part.body.pipe(stream, {end: false});
       part.body.on('end', () => {
         stream.write('\r\n');
         stream.write(finale);
