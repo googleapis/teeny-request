@@ -1,5 +1,14 @@
 # Changelog
 
+### [5.3.3](https://www.github.com/googleapis/teeny-request/compare/v5.3.2...v5.3.3) (2019-12-15)
+
+
+### Bug Fixes
+
+* **deps:** update dependency http-proxy-agent to v3 ([#104](https://www.github.com/googleapis/teeny-request/issues/104)) ([35a47d8](https://www.github.com/googleapis/teeny-request/commit/35a47d83adf92b16eab3fce52deae0e3c1353aa6))
+* **deps:** update dependency https-proxy-agent to v4 ([#105](https://www.github.com/googleapis/teeny-request/issues/105)) ([26b67af](https://www.github.com/googleapis/teeny-request/commit/26b67afcb084ce1b99a62ecc55050d6f8f8aaee4))
+* **docs:** add jsdoc-region-tag plugin ([#98](https://www.github.com/googleapis/teeny-request/issues/98)) ([8f3c35a](https://www.github.com/googleapis/teeny-request/commit/8f3c35aee711a1262ffa7c058eb1b9f18204b80e))
+
 ### [5.3.2](https://www.github.com/googleapis/teeny-request/compare/v5.3.1...v5.3.2) (2019-12-05)
 
 
