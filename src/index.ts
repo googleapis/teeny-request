@@ -192,8 +192,7 @@ function teenyRequest(
   const multipart = reqOpts.multipart as RequestPart[];
   if (reqOpts.multipart && multipart.length === 2) {
     if (!callback) {
-      console.error('multipart without callback not implemented.');
-      return;
+      throw new Error('multipart without callback not implemented.');
     }
     const boundary: string = uuid.v4();
     (options.headers as Headers)[
