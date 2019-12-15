@@ -1,5 +1,12 @@
 # Changelog
 
+### [5.3.2](https://www.github.com/googleapis/teeny-request/compare/v5.3.1...v5.3.2) (2019-12-05)
+
+
+### Bug Fixes
+
+* **deps:** pin TypeScript below 3.7.0 ([#102](https://www.github.com/googleapis/teeny-request/issues/102)) ([c0b81e6](https://www.github.com/googleapis/teeny-request/commit/c0b81e6e7c1bb7e4a3e823c2e41692bc8ede0218))
+
 ### [5.3.1](https://www.github.com/googleapis/teeny-request/compare/v5.3.0...v5.3.1) (2019-10-29)
 
 
