@@ -192,7 +192,8 @@ function teenyRequest(
   const multipart = reqOpts.multipart as RequestPart[];
   if (reqOpts.multipart && multipart.length === 2) {
     if (!callback) {
-      throw new Error('multipart without callback not implemented.');
+      // TODO: add support for multipart uploads through streaming
+      throw new Error('Multipart without callback is not implemented.');
     }
     const boundary: string = uuid.v4();
     (options.headers as Headers)[
