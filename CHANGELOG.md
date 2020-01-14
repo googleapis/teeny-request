@@ -1,5 +1,16 @@
 # Changelog
 
+## [6.0.0](https://www.github.com/googleapis/teeny-request/compare/v5.3.3...v6.0.0) (2020-01-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove console log and throw instead (#107)
+
+### Bug Fixes
+
+* remove console log and throw instead ([#107](https://www.github.com/googleapis/teeny-request/issues/107)) ([965beaa](https://www.github.com/googleapis/teeny-request/commit/965beaae17f0273992c9856ebf79b6f1befc59fe))
+
 ### [5.3.3](https://www.github.com/googleapis/teeny-request/compare/v5.3.2...v5.3.3) (2019-12-15)
 
 
