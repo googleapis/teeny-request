@@ -35,7 +35,7 @@
   },
   "homepage": "https://github.com/googleapis/teeny-request#readme",
   "dependencies": {
-    "http-proxy-agent": "^3.0.0",
+    "http-proxy-agent": "^4.0.0",
     "https-proxy-agent": "^4.0.0",
     "node-fetch": "^2.2.0",
     "stream-events": "^1.0.5",
