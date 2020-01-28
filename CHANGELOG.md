@@ -1,5 +1,12 @@
 # Changelog
 
+### [6.0.1](https://www.github.com/googleapis/teeny-request/compare/v6.0.0...v6.0.1) (2020-01-24)
+
+
+### Bug Fixes
+
+* **deps:** update dependency http-proxy-agent to v4 ([#121](https://www.github.com/googleapis/teeny-request/issues/121)) ([7caabcf](https://www.github.com/googleapis/teeny-request/commit/7caabcf154d8cf0848e443ce2cd4fbfae913ca41))
+
 ## [6.0.0](https://www.github.com/googleapis/teeny-request/compare/v5.3.3...v6.0.0) (2020-01-11)
 
 
