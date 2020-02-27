@@ -15,9 +15,8 @@
  */
 
 import * as assert from 'assert';
-import {describe, it} from 'mocha';
+import {describe, it, afterEach} from 'mocha';
 import * as http from 'http';
-import * as https from 'https';
 import * as sinon from 'sinon';
 import {getAgent} from '../src/agents';
 
