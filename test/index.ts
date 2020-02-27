@@ -15,13 +15,11 @@
  */
 
 import * as assert from 'assert';
-import {describe, it} from 'mocha';
+import {describe, it, afterEach} from 'mocha';
 import * as nock from 'nock';
-import {Readable} from 'stream';
+import {Readable, PassThrough} from 'stream';
 import * as sinon from 'sinon';
 import {teenyRequest} from '../src';
-
-import {PassThrough} from 'stream';
 
 // tslint:disable-next-line variable-name
 const HttpProxyAgent = require('http-proxy-agent');
@@ -249,10 +247,18 @@ describe('teeny', () => {
     const scope = mockJson();
     const stream = teenyRequest({uri}).on('error', done);
     stream.on('response', responseStream => {
-      assert.strictEqual(responseStream.body._readableState.pipesCount, 0);
-
+      // We are using an internal property of Readable to get the number of
+      // active readers. The property changed from `pipesCount: number` in
+      // Node.js 12.x and below to `pipes: Array` in Node.js 13.x.
+      let numPipes =
+        responseStream.body._readableState.pipesCount ??
+        responseStream.body._readableState.pipes?.length;
+      assert.strictEqual(numPipes, 0);
       stream.on('data', () => {
-        assert.strictEqual(responseStream.body._readableState.pipesCount, 1);
+        numPipes =
+          responseStream.body._readableState.pipesCount ??
+          responseStream.body._readableState.pipes?.length;
+        assert.strictEqual(numPipes, 1);
         done();
       });
     });
