@@ -1,5 +1,12 @@
 # Changelog
 
+### [6.0.3](https://www.github.com/googleapis/teeny-request/compare/v6.0.2...v6.0.3) (2020-03-06)
+
+
+### Bug Fixes
+
+* **deps:** update dependency uuid to v7 ([#134](https://www.github.com/googleapis/teeny-request/issues/134)) ([97817bf](https://www.github.com/googleapis/teeny-request/commit/97817bfb12396f620b2e280dcdc8965c4815abb5))
+
 ### [6.0.2](https://www.github.com/googleapis/teeny-request/compare/v6.0.1...v6.0.2) (2020-02-10)
 
 
