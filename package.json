@@ -7,11 +7,11 @@
   "scripts": {
     "test": "c8 mocha build/test",
     "compile": "tsc -p .",
-    "pretest": "npm run compile",
     "lint": "gts check",
     "clean": "gts clean",
     "fix": "gts fix",
     "prepare": "npm run compile",
+    "pretest": "npm run compile",
     "posttest": "npm run lint",
     "docs": "compodoc src/",
     "predocs-test": "npm run docs",
@@ -43,18 +43,19 @@
   },
   "devDependencies": {
     "@compodoc/compodoc": "^1.1.9",
+    "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@types/mocha": "^7.0.0",
     "@types/node-fetch": "^2.1.2",
     "@types/sinon": "^7.0.13",
     "@types/uuid": "^7.0.0",
     "c8": "^7.0.0",
     "codecov": "^3.1.0",
-    "gts": "^1.0.0",
+    "gts": "next",
     "linkinator": "^2.0.0",
     "mocha": "^7.0.0",
     "nock": "^12.0.0",
     "sinon": "^9.0.0",
-    "typescript": "~3.8.2"
+    "typescript": "^3.8.3"
   },
   "nyc": {
     "exclude": [
