@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import {Agent} from 'https';
+import {Agent, AgentOptions as HttpsAgentOptions} from 'https';
+import {AgentOptions as HttpAgentOptions} from 'http';
 import fetch, * as f from 'node-fetch';
 import {PassThrough, Readable} from 'stream';
 import * as uuid from 'uuid';
@@ -35,6 +36,7 @@ export interface CoreOptions {
   proxy?: string;
   multipart?: RequestPart[];
   forever?: boolean;
+  pool?: HttpsAgentOptions | HttpAgentOptions;
 }
 
 export interface OptionsWithUri extends CoreOptions {
