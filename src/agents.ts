@@ -19,9 +19,6 @@ import {Agent as HTTPSAgent} from 'https';
 import {parse} from 'url';
 import {Options} from './';
 
-const createHttpProxyAgent = require('http-proxy-agent');
-const createHttpsProxyAgent = require('https-proxy-agent');
-
 export const pool = new Map<string, HTTPAgent>();
 
 export type HttpAnyAgent = HTTPAgent | HTTPSAgent;
@@ -50,7 +47,9 @@ export function getAgent(
 
   if (proxy) {
     // tslint:disable-next-line variable-name
-    const Agent = isHttp ? createHttpProxyAgent : createHttpsProxyAgent;
+    const Agent = isHttp
+      ? require('http-proxy-agent')
+      : require('https-proxy-agent');
 
     const proxyOpts = {...parse(proxy), ...poolOptions};
     return new Agent(proxyOpts);
