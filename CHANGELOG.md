@@ -1,5 +1,12 @@
 # Changelog
 
+### [6.0.4](https://www.github.com/googleapis/teeny-request/compare/v6.0.3...v6.0.4) (2020-04-05)
+
+
+### Bug Fixes
+
+* update template files for Node.js libraries ([#152](https://www.github.com/googleapis/teeny-request/issues/152)) ([89833c3](https://www.github.com/googleapis/teeny-request/commit/89833c3c3e8afea04c85a60811f122c5a6d37e48))
+
 ### [6.0.3](https://www.github.com/googleapis/teeny-request/compare/v6.0.2...v6.0.3) (2020-03-06)
 
 
