@@ -17,8 +17,9 @@
 import * as assert from 'assert';
 import {describe, it, afterEach} from 'mocha';
 import * as http from 'http';
+import * as https from 'https';
 import * as sinon from 'sinon';
-import {getAgent} from '../src/agents';
+import {getAgent, pool} from '../src/agents';
 
 // tslint:disable-next-line variable-name
 const HttpProxyAgent = require('http-proxy-agent');
@@ -30,7 +31,10 @@ describe('agents', () => {
   const httpsUri = 'https://example.com';
   const sandbox = sinon.createSandbox();
 
-  afterEach(() => sandbox.restore());
+  afterEach(() => {
+    sandbox.restore();
+    pool.clear();
+  });
 
   describe('getAgent', () => {
     const defaultOptions = {uri: httpUri};
@@ -51,11 +55,22 @@ describe('agents', () => {
       describe('http', () => {
         const uri = httpUri;
         const proxy = 'http://hello.there:8080';
+        const proxyExpected = {
+          hostname: 'hello.there',
+          port: 8080,
+          protocol: 'http:',
+        };
 
         it('should respect the proxy option', () => {
           const options = Object.assign({proxy}, defaultOptions);
           const agent = getAgent(uri, options);
           assert(agent instanceof HttpProxyAgent);
+
+          // tslint:disable-next-line:no-any
+          const {proxy: proxyActual}: any = agent!;
+          assert.strictEqual(proxyActual.protocol, proxyExpected.protocol);
+          assert.strictEqual(proxyActual.hostname, proxyExpected.hostname);
+          assert.strictEqual(proxyActual.port, proxyExpected.port);
         });
 
         envVars.forEach(envVar => {
@@ -71,11 +86,22 @@ describe('agents', () => {
       describe('https', () => {
         const uri = httpsUri;
         const proxy = 'https://hello.there:8080';
+        const proxyExpected = {
+          hostname: 'hello.there',
+          port: 8080,
+          protocol: 'https:',
+        };
 
         it('should respect the proxy option', () => {
           const options = Object.assign({proxy}, defaultOptions);
           const agent = getAgent(uri, options);
           assert(agent instanceof HttpsProxyAgent);
+
+          // tslint:disable-next-line:no-any
+          const {proxy: proxyActual}: any = agent!;
+          assert.strictEqual(proxyActual.protocol, proxyExpected.protocol);
+          assert.strictEqual(proxyActual.hostname, proxyExpected.hostname);
+          assert.strictEqual(proxyActual.port, proxyExpected.port);
         });
 
         envVars.forEach(envVar => {
@@ -107,18 +133,84 @@ describe('agents', () => {
       });
 
       describe('https', () => {
-        const uri = httpUri;
+        const uri = httpsUri;
         const options = Object.assign({forever: true}, defaultOptions);
 
         it('should return an http Agent', () => {
           const agent = getAgent(uri, options)!;
-          assert(agent instanceof http.Agent);
+          assert(agent instanceof https.Agent);
         });
 
         it('should cache the agent', () => {
           const agent1 = getAgent(uri, options);
           const agent2 = getAgent(uri, options);
           assert.strictEqual(agent1, agent2);
+        });
+      });
+    });
+
+    describe('pool', () => {
+      describe('http', () => {
+        const uri = httpUri;
+
+        it('should pass AgentOptions from pool config when providing agent', () => {
+          const options = Object.assign(
+            {
+              forever: true,
+              pool: {
+                maxSockets: 1000,
+              },
+            },
+            defaultOptions
+          );
+          const agent = getAgent(uri, options);
+          assert.strictEqual(agent!.maxSockets, 1000);
+        });
+
+        it('should not set global AgentOptions from only pool config', () => {
+          const options = Object.assign(
+            {
+              pool: {
+                maxSockets: 1000,
+              },
+            },
+            defaultOptions
+          );
+          const agent = getAgent(uri, options);
+          assert.strictEqual(agent, undefined);
+          assert.notStrictEqual(http.globalAgent.maxSockets, 1000);
+        });
+      });
+
+      describe('https', () => {
+        const uri = httpsUri;
+
+        it('should pass AgentOptions from pool config when providing agent', () => {
+          const options = Object.assign(
+            {
+              forever: true,
+              pool: {
+                maxSockets: 1000,
+              },
+            },
+            defaultOptions
+          );
+          const agent = getAgent(uri, options);
+          assert.strictEqual(agent!.maxSockets, 1000);
+        });
+
+        it('should not set global AgentOptions from only pool config', () => {
+          const options = Object.assign(
+            {
+              pool: {
+                maxSockets: 1000,
+              },
+            },
+            defaultOptions
+          );
+          const agent = getAgent(uri, options);
+          assert.strictEqual(agent, undefined);
+          assert.notStrictEqual(https.globalAgent.maxSockets, 1000);
         });
       });
     });

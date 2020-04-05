@@ -20,6 +20,7 @@ import * as nock from 'nock';
 import {Readable, PassThrough} from 'stream';
 import * as sinon from 'sinon';
 import {teenyRequest} from '../src';
+import {pool} from '../src/agents';
 
 // tslint:disable-next-line variable-name
 const HttpProxyAgent = require('http-proxy-agent');
@@ -38,6 +39,7 @@ function mockJson() {
 describe('teeny', () => {
   const sandbox = sinon.createSandbox();
   afterEach(() => {
+    pool.clear();
     sandbox.restore();
     nock.cleanAll();
   });

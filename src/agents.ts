@@ -16,19 +16,25 @@
 
 import {Agent as HTTPAgent} from 'http';
 import {Agent as HTTPSAgent} from 'https';
+import {parse} from 'url';
 import {Options} from './';
 
-const pool = new Map<string, HTTPAgent>();
+export const pool = new Map<string, HTTPAgent>();
+
+export type HttpAnyAgent = HTTPAgent | HTTPSAgent;
 
 /**
  * Returns a custom request Agent if one is found, otherwise returns undefined
  * which will result in the global http(s) Agent being used.
  * @private
  * @param {string} uri The request uri
- * @param {object} reqOpts The request options
- * @returns {Agent|undefined}
+ * @param {Options} reqOpts The request options
+ * @returns {HttpAnyAgent|undefined}
  */
-export function getAgent(uri: string, reqOpts: Options): HTTPAgent | undefined {
+export function getAgent(
+  uri: string,
+  reqOpts: Options
+): HttpAnyAgent | undefined {
   const isHttp = uri.startsWith('http://');
   const proxy =
     reqOpts.proxy ||
@@ -37,13 +43,16 @@ export function getAgent(uri: string, reqOpts: Options): HTTPAgent | undefined {
     process.env.HTTPS_PROXY ||
     process.env.https_proxy;
 
+  const poolOptions = Object.assign({}, reqOpts.pool);
+
   if (proxy) {
     // tslint:disable-next-line variable-name
     const Agent = isHttp
       ? require('http-proxy-agent')
       : require('https-proxy-agent');
 
-    return new Agent(proxy) as HTTPAgent;
+    const proxyOpts = {...parse(proxy), ...poolOptions};
+    return new Agent(proxyOpts);
   }
 
   let key = isHttp ? 'http' : 'https';
@@ -54,7 +63,7 @@ export function getAgent(uri: string, reqOpts: Options): HTTPAgent | undefined {
     if (!pool.has(key)) {
       // tslint:disable-next-line variable-name
       const Agent = isHttp ? HTTPAgent : HTTPSAgent;
-      pool.set(key, new Agent({keepAlive: true}));
+      pool.set(key, new Agent({...poolOptions, keepAlive: true}));
     }
   }
 
