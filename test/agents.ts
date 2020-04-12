@@ -21,9 +21,9 @@ import * as https from 'https';
 import * as sinon from 'sinon';
 import {getAgent, pool} from '../src/agents';
 
-// tslint:disable-next-line variable-name
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const HttpProxyAgent = require('http-proxy-agent');
-// tslint:disable-next-line variable-name
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const HttpsProxyAgent = require('https-proxy-agent');
 
 describe('agents', () => {
@@ -66,7 +66,7 @@ describe('agents', () => {
           const agent = getAgent(uri, options);
           assert(agent instanceof HttpProxyAgent);
 
-          // tslint:disable-next-line:no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const {proxy: proxyActual}: any = agent!;
           assert.strictEqual(proxyActual.protocol, proxyExpected.protocol);
           assert.strictEqual(proxyActual.hostname, proxyExpected.hostname);
@@ -97,7 +97,7 @@ describe('agents', () => {
           const agent = getAgent(uri, options);
           assert(agent instanceof HttpsProxyAgent);
 
-          // tslint:disable-next-line:no-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const {proxy: proxyActual}: any = agent!;
           assert.strictEqual(proxyActual.protocol, proxyExpected.protocol);
           assert.strictEqual(proxyActual.hostname, proxyExpected.hostname);

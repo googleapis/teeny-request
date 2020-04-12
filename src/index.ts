@@ -20,18 +20,19 @@ import fetch, * as f from 'node-fetch';
 import {PassThrough, Readable} from 'stream';
 import * as uuid from 'uuid';
 import {getAgent} from './agents';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const streamEvents = require('stream-events');
 
 export interface CoreOptions {
   method?: string;
   timeout?: number;
   gzip?: boolean;
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   json?: any;
   headers?: Headers;
   body?: string | {};
   useQuerystring?: boolean;
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   qs?: any;
   proxy?: string;
   multipart?: RequestPart[];
@@ -55,7 +56,7 @@ export interface Request extends PassThrough {
   href?: string;
 }
 
-// tslint:disable-next-line no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface Response<T = any> {
   statusCode: number;
   headers: Headers;
@@ -68,7 +69,7 @@ export interface RequestPart {
   body: string | Readable;
 }
 
-// tslint:disable-next-line no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface RequestCallback<T = any> {
   (err: Error | null, response: Response, body?: T): void;
 }
@@ -78,7 +79,7 @@ export class RequestError extends Error {
 }
 
 interface Headers {
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [index: string]: any;
 }
 
@@ -109,12 +110,13 @@ function requestToFetchOptions(reqOpts: Options) {
     }
   }
 
-  // tslint:disable-next-line no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   options.headers = reqOpts.headers as any;
 
   let uri = ((reqOpts as OptionsWithUri).uri ||
     (reqOpts as OptionsWithUrl).url) as string;
   if (reqOpts.useQuerystring === true || typeof reqOpts.qs === 'object') {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const qs = require('querystring');
     const params = qs.stringify(reqOpts.qs);
     uri = uri + '?' + params;
@@ -245,7 +247,7 @@ function teenyRequest(
   if (callback === undefined) {
     // Stream mode
     const requestStream = streamEvents(new PassThrough());
-    // tslint:disable-next-line no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let responseStream: any;
     requestStream.once('reading', () => {
       if (responseStream) {
