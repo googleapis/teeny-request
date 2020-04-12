@@ -1,5 +1,18 @@
 # Changelog
 
+## [6.1.0](https://www.github.com/googleapis/teeny-request/compare/v6.0.3...v6.1.0) (2020-04-12)
+
+
+### Features
+
+* pass agent options when using agent pool config ([#149](https://www.github.com/googleapis/teeny-request/issues/149)) ([38ece79](https://www.github.com/googleapis/teeny-request/commit/38ece79151b667ec1a72ec50b1c7a58258924794))
+
+
+### Bug Fixes
+
+* apache license URL ([#468](https://www.github.com/googleapis/teeny-request/issues/468)) ([#156](https://www.github.com/googleapis/teeny-request/issues/156)) ([01ac7bd](https://www.github.com/googleapis/teeny-request/commit/01ac7bd01e870796fd15355e079649633d5d5983))
+* update template files for Node.js libraries ([#152](https://www.github.com/googleapis/teeny-request/issues/152)) ([89833c3](https://www.github.com/googleapis/teeny-request/commit/89833c3c3e8afea04c85a60811f122c5a6d37e48))
+
 ### [6.0.3](https://www.github.com/googleapis/teeny-request/compare/v6.0.2...v6.0.3) (2020-03-06)
 
 
