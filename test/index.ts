@@ -22,18 +22,16 @@ import * as sinon from 'sinon';
 import {teenyRequest} from '../src';
 import {pool} from '../src/agents';
 
-// tslint:disable-next-line variable-name
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const HttpProxyAgent = require('http-proxy-agent');
-// tslint:disable-next-line variable-name
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const HttpsProxyAgent = require('https-proxy-agent');
 
 nock.disableNetConnect();
 const uri = 'https://example.com';
 
 function mockJson() {
-  return nock(uri)
-    .get('/')
-    .reply(200, {hello: '🌍'});
+  return nock(uri).get('/').reply(200, {hello: '🌍'});
 }
 
 describe('teeny', () => {
@@ -70,9 +68,7 @@ describe('teeny', () => {
   it('response event emits object compatible with request module', done => {
     const reqHeaders = {fruit: 'banana'};
     const resHeaders = {veggies: 'carrots'};
-    const scope = nock(uri)
-      .get('/')
-      .reply(202, 'ok', resHeaders);
+    const scope = nock(uri).get('/').reply(202, 'ok', resHeaders);
     const reqStream = teenyRequest({uri, headers: reqHeaders});
     reqStream
       .on('response', res => {
@@ -91,9 +87,7 @@ describe('teeny', () => {
 
   it('should include the request in the response', done => {
     const path = '/?dessert=pie';
-    const scope = nock(uri)
-      .get(path)
-      .reply(202);
+    const scope = nock(uri).get(path).reply(202);
     const headers = {dinner: 'tacos'};
     const url = `${uri}${path}`;
     teenyRequest({url, headers}, (error, response) => {
@@ -121,9 +115,7 @@ describe('teeny', () => {
   it('should include headers in the response', done => {
     const headers = {dinner: 'tacos'};
     const body = {hello: '🌍'};
-    const scope = nock(uri)
-      .get('/')
-      .reply(200, body, headers);
+    const scope = nock(uri).get('/').reply(200, body, headers);
     teenyRequest({uri}, (err, res) => {
       assert.ifError(err);
       assert.strictEqual(headers['dinner'], res.headers['dinner']);
@@ -133,12 +125,10 @@ describe('teeny', () => {
   });
 
   it('should accept the forever option', done => {
-    const scope = nock(uri)
-      .get('/')
-      .reply(200);
+    const scope = nock(uri).get('/').reply(200);
     teenyRequest({uri, forever: true}, (err, res) => {
       assert.ifError(err);
-      // tslint:disable-next-line no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       assert.strictEqual((res.request.agent as any).keepAlive, true);
       scope.done();
       done();
@@ -150,11 +140,9 @@ describe('teeny', () => {
       'Accept-Encoding': 'gzip,deflate',
     };
 
-    const scope = nock(uri, {reqheaders})
-      .get('/')
-      .reply(200);
+    const scope = nock(uri, {reqheaders}).get('/').reply(200);
 
-    teenyRequest({uri, gzip: true}, (err, res) => {
+    teenyRequest({uri, gzip: true}, err => {
       assert.ifError(err);
       scope.done();
       done();
@@ -164,11 +152,9 @@ describe('teeny', () => {
   it('should allow setting compress/gzip to false', done => {
     const badheaders = ['Accept-Encoding'];
 
-    const scope = nock(uri, {badheaders})
-      .get('/')
-      .reply(200);
+    const scope = nock(uri, {badheaders}).get('/').reply(200);
 
-    teenyRequest({uri, gzip: false}, (err, res) => {
+    teenyRequest({uri, gzip: false}, err => {
       assert.ifError(err);
       scope.done();
       done();
@@ -180,9 +166,7 @@ describe('teeny', () => {
     it(`should respect ${v} environment variable for proxy config`, done => {
       sandbox.stub(process, 'env').value({[v]: 'https://fake.proxy'});
       const expectedBody = {hello: '🌎'};
-      const scope = nock(uri)
-        .get('/')
-        .reply(200, expectedBody);
+      const scope = nock(uri).get('/').reply(200, expectedBody);
       teenyRequest({uri}, (err, res, body) => {
         scope.done();
         assert.ifError(err);
@@ -196,9 +180,7 @@ describe('teeny', () => {
   it('should create http proxy if upstream scheme is http', done => {
     sandbox.stub(process, 'env').value({http_proxy: 'https://fake.proxy'});
     const expectedBody = {hello: '🌎'};
-    const scope = nock('http://example.com')
-      .get('/')
-      .reply(200, expectedBody);
+    const scope = nock('http://example.com').get('/').reply(200, expectedBody);
     teenyRequest({uri: 'http://example.com'}, (err, res, body) => {
       scope.done();
       assert.ifError(err);
@@ -210,9 +192,7 @@ describe('teeny', () => {
 
   it('should use proxy if set in request options', done => {
     const expectedBody = {hello: '🌎'};
-    const scope = nock(uri)
-      .get('/')
-      .reply(200, expectedBody);
+    const scope = nock(uri).get('/').reply(200, expectedBody);
     teenyRequest({uri, proxy: 'https://fake.proxy'}, (err, res, body) => {
       scope.done();
       assert.ifError(err);
@@ -226,12 +206,14 @@ describe('teeny', () => {
   it('should not throw exception when piped through pumpify', () => {
     const scope = mockJson();
     teenyRequest({uri}).pipe(new PassThrough());
+    scope.done();
   });
 
   it('should emit response event when called without callback', done => {
     const scope = mockJson();
     teenyRequest({uri}).on('response', res => {
       assert.ok(res);
+      scope.done();
       return done();
     });
   });
@@ -241,6 +223,7 @@ describe('teeny', () => {
     teenyRequest({uri})
       .on('error', done)
       .on('data', () => {
+        scope.done();
         done();
       });
   });
@@ -261,6 +244,7 @@ describe('teeny', () => {
           responseStream.body._readableState.pipesCount ??
           responseStream.body._readableState.pipes?.length;
         assert.strictEqual(numPipes, 1);
+        scope.done();
         done();
       });
     });
