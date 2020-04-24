@@ -19,7 +19,8 @@
     "predocs-test": "npm run docs",
     "docs-test": "linkinator docs",
     "samples-test": "echo no sample tests!",
-    "system-test": "echo no system tests!"
+    "system-test": "echo no system tests!",
+    "precompile": "gts clean"
   },
   "files": [
     "build/src"
