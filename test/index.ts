@@ -17,9 +17,10 @@
 import * as assert from 'assert';
 import {describe, it, afterEach} from 'mocha';
 import * as nock from 'nock';
+import * as proxyquire from 'proxyquire';
 import {Readable, PassThrough} from 'stream';
 import * as sinon from 'sinon';
-import {teenyRequest} from '../src';
+import {teenyRequest as teenyRequestSrc} from '../src';
 import {pool} from '../src/agents';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -27,6 +28,7 @@ const HttpProxyAgent = require('http-proxy-agent');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const HttpsProxyAgent = require('https-proxy-agent');
 
+proxyquire.noPreserveCache();
 nock.disableNetConnect();
 const uri = 'https://example.com';
 
@@ -36,9 +38,25 @@ function mockJson() {
 
 describe('teeny', () => {
   const sandbox = sinon.createSandbox();
+
+  const statsSandbox = sinon.createSandbox();
+  const statsInstanceStubs = {
+    requestFinished: statsSandbox.stub(),
+    requestStarting: statsSandbox.stub(),
+    setOptions: statsSandbox.stub(),
+  };
+
+  const teenyRequest = proxyquire('../src', {
+    './TeenyStatistics': {
+      TeenyStatistics: sinon.stub().returns(statsInstanceStubs),
+      '@noCallThru': true,
+    },
+  }).teenyRequest as typeof teenyRequestSrc;
+
   afterEach(() => {
     pool.clear();
     sandbox.restore();
+    statsSandbox.reset();
     nock.cleanAll();
   });
 
@@ -248,5 +266,58 @@ describe('teeny', () => {
         done();
       });
     });
+  });
+
+  it('should track stats, callback mode', done => {
+    const scope = mockJson();
+    teenyRequest({uri}, () => {
+      assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
+      assert.ok(statsInstanceStubs.requestFinished.calledOnceWithExactly());
+      scope.done();
+      done();
+    });
+  });
+
+  it('should track stats, stream mode', done => {
+    const scope = mockJson();
+    const readable = teenyRequest({uri});
+    assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
+
+    readable.once('response', () => {
+      assert.ok(statsInstanceStubs.requestFinished.calledOnceWithExactly());
+      scope.done();
+      done();
+    });
+  });
+
+  // TODO multipart is broken with 2 strings
+  it.skip('should track stats, multipart mode', done => {
+    const scope = mockJson();
+    teenyRequest(
+      {
+        headers: {},
+        multipart: [{body: 'foo'}, {body: 'bar'}],
+        uri,
+      },
+      () => {
+        assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
+        assert.ok(statsInstanceStubs.requestFinished.calledOnceWithExactly());
+        scope.done();
+        done();
+      }
+    );
+  });
+
+  it('should pass teeny statistics options', () => {
+    const opts = {concurrentRequests: 42};
+    teenyRequest.setStatOptions(Object.assign({}, opts));
+    assert(statsInstanceStubs.setOptions.calledOnceWithExactly(opts));
+  });
+
+  it('should return teeny statistics options', () => {
+    const opts = {concurrentRequests: 42};
+    statsInstanceStubs.setOptions.returns(Object.assign({}, opts));
+    const optsDefault = teenyRequest.setStatOptions({});
+    assert.deepStrictEqual(optsDefault, opts);
   });
 });
