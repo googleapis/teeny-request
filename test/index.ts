@@ -36,6 +36,10 @@ function mockJson() {
   return nock(uri).get('/').reply(200, {hello: '🌍'});
 }
 
+function mockError() {
+  return nock(uri).get('/').replyWithError('mock err');
+}
+
 describe('teeny', () => {
   const sandbox = sinon.createSandbox();
 
@@ -268,7 +272,7 @@ describe('teeny', () => {
     });
   });
 
-  it('should track stats, callback mode', done => {
+  it('should track stats, callback mode, success', done => {
     const scope = mockJson();
     teenyRequest({uri}, () => {
       assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
@@ -278,7 +282,18 @@ describe('teeny', () => {
     });
   });
 
-  it('should track stats, stream mode', done => {
+  it('should track stats, callback mode, failure', done => {
+    const scope = mockError();
+    teenyRequest({uri}, err => {
+      assert.ok(err);
+      assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
+      assert.ok(statsInstanceStubs.requestFinished.calledOnceWithExactly());
+      scope.done();
+      done();
+    });
+  });
+
+  it('should track stats, stream mode, success', done => {
     const scope = mockJson();
     const readable = teenyRequest({uri});
     assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
@@ -290,8 +305,21 @@ describe('teeny', () => {
     });
   });
 
+  it('should track stats, stream mode, failure', done => {
+    const scope = mockError();
+    const readable = teenyRequest({uri});
+    assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
+
+    readable.once('error', err => {
+      assert.ok(err);
+      assert.ok(statsInstanceStubs.requestFinished.calledOnceWithExactly());
+      scope.done();
+      done();
+    });
+  });
+
   // TODO multipart is broken with 2 strings
-  it.skip('should track stats, multipart mode', done => {
+  it.skip('should track stats, multipart mode, success', done => {
     const scope = mockJson();
     teenyRequest(
       {
@@ -300,6 +328,24 @@ describe('teeny', () => {
         uri,
       },
       () => {
+        assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
+        assert.ok(statsInstanceStubs.requestFinished.calledOnceWithExactly());
+        scope.done();
+        done();
+      }
+    );
+  });
+
+  it.skip('should track stats, multipart mode, failure', done => {
+    const scope = mockError();
+    teenyRequest(
+      {
+        headers: {},
+        multipart: [{body: 'foo'}, {body: 'bar'}],
+        uri,
+      },
+      err => {
+        assert.ok(err);
         assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
         assert.ok(statsInstanceStubs.requestFinished.calledOnceWithExactly());
         scope.done();

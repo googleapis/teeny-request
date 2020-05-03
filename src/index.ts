@@ -246,6 +246,7 @@ function teenyRequest(
         );
       },
       err => {
+        teenyStatistics.requestFinished();
         callback(err, null!, null);
       }
     );
@@ -282,6 +283,7 @@ function teenyRequest(
         requestStream.emit('response', response);
       },
       err => {
+        teenyStatistics.requestFinished();
         requestStream.emit('error', err);
       }
     );
@@ -333,6 +335,7 @@ function teenyRequest(
       );
     },
     err => {
+      teenyStatistics.requestFinished();
       callback(err, null!, null);
     }
   );
