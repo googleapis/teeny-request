@@ -73,7 +73,7 @@ export class TeenyStatistics {
    * @readonly
    * @default 5000
    */
-  static readonly DEFAULT_WARN_CONCURRENT_REQUESTS = 5e3;
+  static readonly DEFAULT_WARN_CONCURRENT_REQUESTS = 5000;
 
   /**
    * @type {TeenyStatisticsConfig}

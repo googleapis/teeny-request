@@ -319,10 +319,12 @@ describe('teeny', () => {
   });
 
   // TODO multipart is broken with 2 strings
+  // https://github.com/googleapis/teeny-request/issues/168
   it.skip('should track stats, multipart mode, success', done => {
     const scope = mockJson();
     teenyRequest(
       {
+        method: 'POST',
         headers: {},
         multipart: [{body: 'foo'}, {body: 'bar'}],
         uri,
@@ -340,6 +342,7 @@ describe('teeny', () => {
     const scope = mockError();
     teenyRequest(
       {
+        method: 'POST',
         headers: {},
         multipart: [{body: 'foo'}, {body: 'bar'}],
         uri,
