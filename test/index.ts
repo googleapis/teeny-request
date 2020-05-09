@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import {describe, it, afterEach, beforeEach} from 'mocha';
 import * as nock from 'nock';
-import * as proxyquire from 'proxyquire';
 import {Readable, PassThrough} from 'stream';
 import * as sinon from 'sinon';
 import {teenyRequest} from '../src';
@@ -29,7 +28,6 @@ const HttpProxyAgent = require('http-proxy-agent');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const HttpsProxyAgent = require('https-proxy-agent');
 
-proxyquire.noPreserveCache();
 nock.disableNetConnect();
 const uri = 'https://example.com';
 
