@@ -103,6 +103,14 @@ export class TeenyStatistics {
   }
 
   /**
+   * Returns a copy of the current options.
+   * @return {TeenyStatisticsOptions}
+   */
+  getOptions(): TeenyStatisticsOptions {
+    return Object.assign({}, this._options);
+  }
+
+  /**
    * Change configured statistics options. This will not preserve unspecified
    *   options that were previously specified, i.e. this is a reset of options.
    * @param {TeenyStatisticsOptions} [opts]

@@ -15,12 +15,13 @@
  */
 
 import * as assert from 'assert';
-import {describe, it, afterEach} from 'mocha';
+import {describe, it, afterEach, beforeEach} from 'mocha';
 import * as nock from 'nock';
 import * as proxyquire from 'proxyquire';
 import {Readable, PassThrough} from 'stream';
 import * as sinon from 'sinon';
-import {teenyRequest as teenyRequestSrc} from '../src';
+import {teenyRequest} from '../src';
+import {TeenyStatistics, TeenyStatisticsWarning} from '../src/TeenyStatistics';
 import {pool} from '../src/agents';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -42,25 +43,26 @@ function mockError() {
 
 describe('teeny', () => {
   const sandbox = sinon.createSandbox();
+  let emitWarnStub: sinon.SinonStub;
+  let statsStub: sinon.SinonStubbedInstance<TeenyStatistics>;
 
-  const statsSandbox = sinon.createSandbox();
-  const statsInstanceStubs = {
-    requestFinished: statsSandbox.stub(),
-    requestStarting: statsSandbox.stub(),
-    setOptions: statsSandbox.stub(),
-  };
+  beforeEach(() => {
+    emitWarnStub = sandbox.stub(process, 'emitWarning');
 
-  const teenyRequest = proxyquire('../src', {
-    './TeenyStatistics': {
-      TeenyStatistics: sinon.stub().returns(statsInstanceStubs),
-      '@noCallThru': true,
-    },
-  }).teenyRequest as typeof teenyRequestSrc;
+    // don't mask other process warns
+    emitWarnStub
+      .callThrough()
+      .withArgs(sinon.match.instanceOf(TeenyStatisticsWarning))
+      .callsFake(() => {});
+
+    // note: this stubs the already instantiated TeenyStatistics
+    statsStub = sandbox.stub(teenyRequest.stats);
+  });
 
   afterEach(() => {
     pool.clear();
     sandbox.restore();
-    statsSandbox.reset();
+    teenyRequest.resetStats();
     nock.cleanAll();
   });
 
@@ -272,11 +274,44 @@ describe('teeny', () => {
     });
   });
 
+  it('should expose TeenyStatistics instance', () => {
+    assert.ok(teenyRequest.stats instanceof TeenyStatistics);
+  });
+
+  it('should allow resetting statistics', () => {
+    const oldStats = teenyRequest.stats;
+    teenyRequest.resetStats();
+    assert.notStrictEqual(teenyRequest.stats, oldStats);
+    assert.ok(teenyRequest.stats instanceof TeenyStatistics);
+  });
+
+  it('should keep the original stats options when resetting', () => {
+    statsStub.getOptions.restore();
+    statsStub.setOptions.restore();
+    teenyRequest.stats.setOptions({concurrentRequests: 42});
+    teenyRequest.resetStats();
+    const newOptions = teenyRequest.stats.getOptions();
+    assert.deepStrictEqual(newOptions, {concurrentRequests: 42});
+  });
+
+  it('should emit warning on too many concurrent requests', done => {
+    statsStub.setOptions.restore();
+    statsStub.requestStarting.restore();
+    teenyRequest.stats.setOptions({concurrentRequests: 1});
+
+    const scope = mockJson();
+    teenyRequest({uri}, () => {
+      assert.ok(emitWarnStub.calledOnce);
+      scope.done();
+      done();
+    });
+  });
+
   it('should track stats, callback mode, success', done => {
     const scope = mockJson();
     teenyRequest({uri}, () => {
-      assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
-      assert.ok(statsInstanceStubs.requestFinished.calledOnceWithExactly());
+      assert.ok(statsStub.requestStarting.calledOnceWithExactly());
+      assert.ok(statsStub.requestFinished.calledOnceWithExactly());
       scope.done();
       done();
     });
@@ -286,8 +321,8 @@ describe('teeny', () => {
     const scope = mockError();
     teenyRequest({uri}, err => {
       assert.ok(err);
-      assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
-      assert.ok(statsInstanceStubs.requestFinished.calledOnceWithExactly());
+      assert.ok(statsStub.requestStarting.calledOnceWithExactly());
+      assert.ok(statsStub.requestFinished.calledOnceWithExactly());
       scope.done();
       done();
     });
@@ -296,10 +331,10 @@ describe('teeny', () => {
   it('should track stats, stream mode, success', done => {
     const scope = mockJson();
     const readable = teenyRequest({uri});
-    assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
+    assert.ok(statsStub.requestStarting.calledOnceWithExactly());
 
     readable.once('response', () => {
-      assert.ok(statsInstanceStubs.requestFinished.calledOnceWithExactly());
+      assert.ok(statsStub.requestFinished.calledOnceWithExactly());
       scope.done();
       done();
     });
@@ -308,18 +343,18 @@ describe('teeny', () => {
   it('should track stats, stream mode, failure', done => {
     const scope = mockError();
     const readable = teenyRequest({uri});
-    assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
+    assert.ok(statsStub.requestStarting.calledOnceWithExactly());
 
     readable.once('error', err => {
       assert.ok(err);
-      assert.ok(statsInstanceStubs.requestFinished.calledOnceWithExactly());
+      assert.ok(statsStub.requestFinished.calledOnceWithExactly());
       scope.done();
       done();
     });
   });
 
   // TODO multipart is broken with 2 strings
-  // https://github.com/googleapis/teeny-request/issues/168
+  // see: https://github.com/googleapis/teeny-request/issues/168
   it.skip('should track stats, multipart mode, success', done => {
     const scope = mockJson();
     teenyRequest(
@@ -330,8 +365,8 @@ describe('teeny', () => {
         uri,
       },
       () => {
-        assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
-        assert.ok(statsInstanceStubs.requestFinished.calledOnceWithExactly());
+        assert.ok(statsStub.requestStarting.calledOnceWithExactly());
+        assert.ok(statsStub.requestFinished.calledOnceWithExactly());
         scope.done();
         done();
       }
@@ -349,24 +384,11 @@ describe('teeny', () => {
       },
       err => {
         assert.ok(err);
-        assert.ok(statsInstanceStubs.requestStarting.calledOnceWithExactly());
-        assert.ok(statsInstanceStubs.requestFinished.calledOnceWithExactly());
+        assert.ok(statsStub.requestStarting.calledOnceWithExactly());
+        assert.ok(statsStub.requestFinished.calledOnceWithExactly());
         scope.done();
         done();
       }
     );
-  });
-
-  it('should pass teeny statistics options', () => {
-    const opts = {concurrentRequests: 42};
-    teenyRequest.setStatOptions(Object.assign({}, opts));
-    assert(statsInstanceStubs.setOptions.calledOnceWithExactly(opts));
-  });
-
-  it('should return teeny statistics options', () => {
-    const opts = {concurrentRequests: 42};
-    statsInstanceStubs.setOptions.returns(Object.assign({}, opts));
-    const optsDefault = teenyRequest.setStatOptions({});
-    assert.deepStrictEqual(optsDefault, opts);
   });
 });

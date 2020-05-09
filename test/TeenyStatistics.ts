@@ -93,6 +93,26 @@ describe('TeenyStatistics', () => {
     });
   });
 
+  describe('getOptions', () => {
+    it('should return the options, including defaults', () => {
+      const t = new TeenyStatistics();
+      assert.deepStrictEqual(t.getOptions(), {
+        concurrentRequests: TeenyStatistics.DEFAULT_WARN_CONCURRENT_REQUESTS,
+      });
+    });
+
+    it('should return the non-default options', () => {
+      const opts1: TeenyStatisticsOptions = {concurrentRequests: 123};
+      const t = new TeenyStatistics(Object.assign({}, opts1));
+      assert.deepStrictEqual(t.getOptions(), opts1);
+    });
+
+    it('should return a copy of the options', () => {
+      const t = new TeenyStatistics();
+      assert.notStrictEqual(t.getOptions(), t['_options']);
+    });
+  });
+
   describe('setOptions', () => {
     hooksForEnvCleanupInThisContext();
 

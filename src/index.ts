@@ -20,7 +20,7 @@ import fetch, * as f from 'node-fetch';
 import {PassThrough, Readable} from 'stream';
 import * as uuid from 'uuid';
 import {getAgent} from './agents';
-import {TeenyStatistics, TeenyStatisticsOptions} from './TeenyStatistics';
+import {TeenyStatistics} from './TeenyStatistics';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const streamEvents = require('stream-events');
 
@@ -83,11 +83,6 @@ interface Headers {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [index: string]: any;
 }
-
-/**
- * Single instance of an interface for keeping track of things.
- */
-const teenyStatistics: TeenyStatistics = new TeenyStatistics();
 
 /**
  * Convert options from Request to Fetch format
@@ -212,10 +207,10 @@ function teenyRequest(
     options.body = createMultipartStream(boundary, multipart);
 
     // Multipart upload
-    teenyStatistics.requestStarting();
+    teenyRequest.stats.requestStarting();
     fetch(uri, options).then(
       res => {
-        teenyStatistics.requestFinished();
+        teenyRequest.stats.requestFinished();
         const header = res.headers.get('content-type');
         const response = fetchToRequestResponse(options, res);
         const body = response.body;
@@ -246,7 +241,7 @@ function teenyRequest(
         );
       },
       err => {
-        teenyStatistics.requestFinished();
+        teenyRequest.stats.requestFinished();
         callback(err, null!, null);
       }
     );
@@ -269,10 +264,10 @@ function teenyRequest(
     });
     options.compress = false;
 
-    teenyStatistics.requestStarting();
+    teenyRequest.stats.requestStarting();
     fetch(uri, options).then(
       res => {
-        teenyStatistics.requestFinished();
+        teenyRequest.stats.requestFinished();
         responseStream = res.body;
 
         responseStream.on('error', (err: Error) => {
@@ -283,7 +278,7 @@ function teenyRequest(
         requestStream.emit('response', response);
       },
       err => {
-        teenyStatistics.requestFinished();
+        teenyRequest.stats.requestFinished();
         requestStream.emit('error', err);
       }
     );
@@ -295,10 +290,10 @@ function teenyRequest(
   }
 
   // GET or POST with callback
-  teenyStatistics.requestStarting();
+  teenyRequest.stats.requestStarting();
   fetch(uri, options).then(
     res => {
-      teenyStatistics.requestFinished();
+      teenyRequest.stats.requestFinished();
       const header = res.headers.get('content-type');
       const response = fetchToRequestResponse(options, res);
       const body = response.body;
@@ -335,7 +330,7 @@ function teenyRequest(
       );
     },
     err => {
-      teenyStatistics.requestFinished();
+      teenyRequest.stats.requestFinished();
       callback(err, null!, null);
     }
   );
@@ -353,11 +348,12 @@ teenyRequest.defaults = (defaults: CoreOptions) => {
 };
 
 /**
- * @see TeenyStatistics#setOptions
- * @param {TeenyStatisticsOptions} opts
- * @return {TeenyStatisticsConfig}
+ * Single instance of an interface for keeping track of things.
  */
-teenyRequest.setStatOptions = (opts: TeenyStatisticsOptions) =>
-  teenyStatistics.setOptions(opts);
+teenyRequest.stats = new TeenyStatistics();
+
+teenyRequest.resetStats = (): void => {
+  teenyRequest.stats = new TeenyStatistics(teenyRequest.stats.getOptions());
+};
 
 export {teenyRequest};
