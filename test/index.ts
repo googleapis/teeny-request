@@ -15,11 +15,12 @@
  */
 
 import * as assert from 'assert';
-import {describe, it, afterEach} from 'mocha';
+import {describe, it, afterEach, beforeEach} from 'mocha';
 import * as nock from 'nock';
 import {Readable, PassThrough} from 'stream';
 import * as sinon from 'sinon';
 import {teenyRequest} from '../src';
+import {TeenyStatistics, TeenyStatisticsWarning} from '../src/TeenyStatistics';
 import {pool} from '../src/agents';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -34,11 +35,32 @@ function mockJson() {
   return nock(uri).get('/').reply(200, {hello: '🌍'});
 }
 
+function mockError() {
+  return nock(uri).get('/').replyWithError('mock err');
+}
+
 describe('teeny', () => {
   const sandbox = sinon.createSandbox();
+  let emitWarnStub: sinon.SinonStub;
+  let statsStub: sinon.SinonStubbedInstance<TeenyStatistics>;
+
+  beforeEach(() => {
+    emitWarnStub = sandbox.stub(process, 'emitWarning');
+
+    // don't mask other process warns
+    emitWarnStub
+      .callThrough()
+      .withArgs(sinon.match.instanceOf(TeenyStatisticsWarning))
+      .callsFake(() => {});
+
+    // note: this stubs the already instantiated TeenyStatistics
+    statsStub = sandbox.stub(teenyRequest.stats);
+  });
+
   afterEach(() => {
     pool.clear();
     sandbox.restore();
+    teenyRequest.resetStats();
     nock.cleanAll();
   });
 
@@ -248,5 +270,123 @@ describe('teeny', () => {
         done();
       });
     });
+  });
+
+  it('should expose TeenyStatistics instance', () => {
+    assert.ok(teenyRequest.stats instanceof TeenyStatistics);
+  });
+
+  it('should allow resetting statistics', () => {
+    const oldStats = teenyRequest.stats;
+    teenyRequest.resetStats();
+    assert.notStrictEqual(teenyRequest.stats, oldStats);
+    assert.ok(teenyRequest.stats instanceof TeenyStatistics);
+  });
+
+  it('should keep the original stats options when resetting', () => {
+    statsStub.getOptions.restore();
+    statsStub.setOptions.restore();
+    teenyRequest.stats.setOptions({concurrentRequests: 42});
+    teenyRequest.resetStats();
+    const newOptions = teenyRequest.stats.getOptions();
+    assert.deepStrictEqual(newOptions, {concurrentRequests: 42});
+  });
+
+  it('should emit warning on too many concurrent requests', done => {
+    statsStub.setOptions.restore();
+    statsStub.requestStarting.restore();
+    teenyRequest.stats.setOptions({concurrentRequests: 1});
+
+    const scope = mockJson();
+    teenyRequest({uri}, () => {
+      assert.ok(emitWarnStub.calledOnce);
+      scope.done();
+      done();
+    });
+  });
+
+  it('should track stats, callback mode, success', done => {
+    const scope = mockJson();
+    teenyRequest({uri}, () => {
+      assert.ok(statsStub.requestStarting.calledOnceWithExactly());
+      assert.ok(statsStub.requestFinished.calledOnceWithExactly());
+      scope.done();
+      done();
+    });
+  });
+
+  it('should track stats, callback mode, failure', done => {
+    const scope = mockError();
+    teenyRequest({uri}, err => {
+      assert.ok(err);
+      assert.ok(statsStub.requestStarting.calledOnceWithExactly());
+      assert.ok(statsStub.requestFinished.calledOnceWithExactly());
+      scope.done();
+      done();
+    });
+  });
+
+  it('should track stats, stream mode, success', done => {
+    const scope = mockJson();
+    const readable = teenyRequest({uri});
+    assert.ok(statsStub.requestStarting.calledOnceWithExactly());
+
+    readable.once('response', () => {
+      assert.ok(statsStub.requestFinished.calledOnceWithExactly());
+      scope.done();
+      done();
+    });
+  });
+
+  it('should track stats, stream mode, failure', done => {
+    const scope = mockError();
+    const readable = teenyRequest({uri});
+    assert.ok(statsStub.requestStarting.calledOnceWithExactly());
+
+    readable.once('error', err => {
+      assert.ok(err);
+      assert.ok(statsStub.requestFinished.calledOnceWithExactly());
+      scope.done();
+      done();
+    });
+  });
+
+  // TODO multipart is broken with 2 strings
+  // see: https://github.com/googleapis/teeny-request/issues/168
+  it.skip('should track stats, multipart mode, success', done => {
+    const scope = mockJson();
+    teenyRequest(
+      {
+        method: 'POST',
+        headers: {},
+        multipart: [{body: 'foo'}, {body: 'bar'}],
+        uri,
+      },
+      () => {
+        assert.ok(statsStub.requestStarting.calledOnceWithExactly());
+        assert.ok(statsStub.requestFinished.calledOnceWithExactly());
+        scope.done();
+        done();
+      }
+    );
+  });
+
+  it.skip('should track stats, multipart mode, failure', done => {
+    const scope = mockError();
+    teenyRequest(
+      {
+        method: 'POST',
+        headers: {},
+        multipart: [{body: 'foo'}, {body: 'bar'}],
+        uri,
+      },
+      err => {
+        assert.ok(err);
+        assert.ok(statsStub.requestStarting.calledOnceWithExactly());
+        assert.ok(statsStub.requestFinished.calledOnceWithExactly());
+        scope.done();
+        done();
+      }
+    );
   });
 });
