@@ -4,14 +4,14 @@
       "git": {
         "name": ".",
         "remote": "https://github.com/googleapis/teeny-request.git",
-        "sha": "f0fbc0ffd5ab91a6a14ee4cc4a992f4e0d67a65d"
+        "sha": "88ff2d0d8e0fc25a4219ef5625b8de353ed4aa29"
       }
     },
     {
       "git": {
         "name": "synthtool",
         "remote": "https://github.com/googleapis/synthtool.git",
-        "sha": "19465d3ec5e5acdb01521d8f3bddd311bcbee28d"
+        "sha": "be74d3e532faa47eb59f1a0eaebde0860d1d8ab4"
       }
     }
   ]
