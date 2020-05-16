@@ -389,4 +389,22 @@ describe('teeny', () => {
       }
     );
   });
+
+  it('should respect followRedirect option being disabled', done => {
+    const scope = nock(uri).get('/').reply(302, '', {
+      location: 'https://www.google.com',
+    });
+    teenyRequest(
+      {
+        uri,
+        followRedirect: false,
+      },
+      (err, res) => {
+        assert.ifError(err);
+        assert.strictEqual(res.statusCode, 302);
+        scope.done();
+        done();
+      }
+    );
+  });
 });

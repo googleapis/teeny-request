@@ -39,6 +39,7 @@ export interface CoreOptions {
   multipart?: RequestPart[];
   forever?: boolean;
   pool?: HttpsAgentOptions | HttpAgentOptions;
+  followRedirect?: boolean;
 }
 
 export interface OptionsWithUri extends CoreOptions {
@@ -124,6 +125,9 @@ function requestToFetchOptions(reqOpts: Options) {
   }
 
   options.agent = getAgent(uri, reqOpts);
+  if (reqOpts.followRedirect === false) {
+    options.redirect = 'manual';
+  }
 
   return {uri, options};
 }
