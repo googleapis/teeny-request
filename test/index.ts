@@ -272,6 +272,17 @@ describe('teeny', () => {
     });
   });
 
+  it('should support passing url independent of options', done => {
+    const scope = mockJson();
+    teenyRequest(uri, (error, response, body) => {
+      assert.ifError(error);
+      assert.strictEqual(response.statusCode, 200);
+      assert.ok(body.hello);
+      scope.done();
+      done();
+    });
+  });
+
   it('should expose TeenyStatistics instance', () => {
     assert.ok(teenyRequest.stats instanceof TeenyStatistics);
   });

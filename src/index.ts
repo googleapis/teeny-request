@@ -186,12 +186,39 @@ function createMultipartStream(boundary: string, multipart: RequestPart[]) {
   return stream;
 }
 
+function teenyRequest(url: string): Request;
+function teenyRequest(url: string, reqOpts: Options): Request;
+function teenyRequest(url: string, callback: RequestCallback): void;
+function teenyRequest(
+  url: string,
+  reqOpts: Options,
+  callback: RequestCallback
+): void;
 function teenyRequest(reqOpts: Options): Request;
 function teenyRequest(reqOpts: Options, callback: RequestCallback): void;
 function teenyRequest(
-  reqOpts: Options,
-  callback?: RequestCallback
+  urlOrOpts: Options | string,
+  optsOrCallback?: Options | RequestCallback,
+  cb?: RequestCallback
 ): Request | void {
+  let url: string | undefined = undefined;
+  let reqOpts: Options | undefined = undefined;
+  if (typeof urlOrOpts === 'string') {
+    url = urlOrOpts;
+  }
+  if (typeof urlOrOpts === 'object') {
+    reqOpts = urlOrOpts;
+  }
+  if (typeof optsOrCallback === 'object') {
+    reqOpts = optsOrCallback;
+  }
+  const callback = typeof optsOrCallback === 'function' ? optsOrCallback : cb;
+  reqOpts = reqOpts || {url: url!};
+  if (url) {
+    (reqOpts as OptionsWithUrl).url = url;
+    (reqOpts as OptionsWithUri).uri = url;
+  }
+
   const {uri, options} = requestToFetchOptions(reqOpts);
 
   const multipart = reqOpts.multipart as RequestPart[];
