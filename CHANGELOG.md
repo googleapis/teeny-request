@@ -1,5 +1,29 @@
 # Changelog
 
+## [7.0.0](https://www.github.com/googleapis/teeny-request/compare/v6.0.3...v7.0.0) (2020-06-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* dropping support for Node.js 8.x
+
+### Features
+
+* pass agent options when using agent pool config ([#149](https://www.github.com/googleapis/teeny-request/issues/149)) ([38ece79](https://www.github.com/googleapis/teeny-request/commit/38ece79151b667ec1a72ec50b1c7a58258924794))
+* warn on too many concurrent requests ([#165](https://www.github.com/googleapis/teeny-request/issues/165)) ([88ff2d0](https://www.github.com/googleapis/teeny-request/commit/88ff2d0d8e0fc25a4219ef5625b8de353ed4aa29))
+
+
+### Bug Fixes
+
+* apache license URL ([#468](https://www.github.com/googleapis/teeny-request/issues/468)) ([#156](https://www.github.com/googleapis/teeny-request/issues/156)) ([01ac7bd](https://www.github.com/googleapis/teeny-request/commit/01ac7bd01e870796fd15355e079649633d5d5983))
+* update template files for Node.js libraries ([#152](https://www.github.com/googleapis/teeny-request/issues/152)) ([89833c3](https://www.github.com/googleapis/teeny-request/commit/89833c3c3e8afea04c85a60811f122c5a6d37e48))
+* **deps:** update dependency uuid to v8 ([#164](https://www.github.com/googleapis/teeny-request/issues/164)) ([2ab8155](https://www.github.com/googleapis/teeny-request/commit/2ab81550aeb8ca914516ff4ac20ebbb7b3d73fa5))
+
+
+### Build System
+
+* drop support for node.js 8.x ([#159](https://www.github.com/googleapis/teeny-request/issues/159)) ([d87aa73](https://www.github.com/googleapis/teeny-request/commit/d87aa73d3fafbdc013b03b7629a41decda6da98a))
+
 ### [6.0.3](https://www.github.com/googleapis/teeny-request/compare/v6.0.2...v6.0.3) (2020-03-06)
 
 
