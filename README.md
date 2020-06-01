@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/fhinkel/teeny-request.svg?branch=master)](https://travis-ci.org/fhinkel/teeny-request)
+[![Build Status](https://travis-ci.org/googleapis/teeny-request.svg?branch=master)](https://travis-ci.org/googleapis/teeny-request)
 
 # teeny-request 
 
