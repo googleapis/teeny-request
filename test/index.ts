@@ -225,9 +225,14 @@ describe('teeny', () => {
   });
 
   // see: https://github.com/googleapis/nodejs-storage/issues/798
-  it('should not throw exception when piped through pumpify', () => {
+  it('should not throw exception when piped through pumpify', async () => {
     const scope = mockJson();
-    teenyRequest({uri}).pipe(new PassThrough());
+    const stream = teenyRequest({uri}).pipe(new PassThrough());
+    let content = '';
+    for await (const data of stream) {
+      content += data;
+    }
+    assert.deepStrictEqual(JSON.parse(content), {hello: '🌍'});
     scope.done();
   });
 
