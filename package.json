@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@compodoc/compodoc": "^1.1.9",
-    "@types/mocha": "^7.0.0",
+    "@types/mocha": "^8.0.0",
     "@types/node-fetch": "^2.1.2",
     "@types/sinon": "^9.0.0",
     "@types/uuid": "^8.0.0",
