@@ -1,5 +1,12 @@
 # Changelog
 
+### [7.0.1](https://www.github.com/googleapis/teeny-request/compare/v7.0.0...v7.0.1) (2020-09-29)
+
+
+### Bug Fixes
+
+* **deps:** update node-fetch to 2.6.1 ([#200](https://www.github.com/googleapis/teeny-request/issues/200)) ([8958a78](https://www.github.com/googleapis/teeny-request/commit/8958a78b117e5610f3ccf121ba1d650dbe9739f8))
+
 ## [7.0.0](https://www.github.com/googleapis/teeny-request/compare/v6.0.3...v7.0.0) (2020-06-01)
 
 
