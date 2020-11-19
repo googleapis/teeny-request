@@ -158,9 +158,8 @@ describe('TeenyStatistics', () => {
     it('should be read-only', () => {
       const t = new TeenyStatistics();
       assert.throws(() => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
-        t.counters = {concurrentRequests: 99};
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (t as any).counters = {concurrentRequests: 99};
       });
     });
   });
