@@ -105,7 +105,9 @@ function requestToFetchOptions(reqOpts: Options) {
     // Set body to JSON representation of value
     options.body = JSON.stringify(reqOpts.json);
   } else {
-    if (typeof reqOpts.body !== 'string') {
+    if (Buffer.isBuffer(reqOpts.body)) {
+      options.body = reqOpts.body;
+    } else if (typeof reqOpts.body !== 'string') {
       options.body = JSON.stringify(reqOpts.body);
     } else {
       options.body = reqOpts.body;
