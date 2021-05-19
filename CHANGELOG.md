@@ -1,5 +1,17 @@
 # Changelog
 
+## [7.1.0](https://www.github.com/googleapis/teeny-request/compare/v7.0.1...v7.1.0) (2021-05-19)
+
+
+### Features
+
+* add `gcf-owl-bot[bot]` to `ignoreAuthors` ([#224](https://www.github.com/googleapis/teeny-request/issues/224)) ([3e7424f](https://www.github.com/googleapis/teeny-request/commit/3e7424fb63f0c0dca3606d6e1fc2f294f9d86ba5))
+
+
+### Bug Fixes
+
+* Buffer is allow as body without encoding to string ([#223](https://www.github.com/googleapis/teeny-request/issues/223)) ([d9bcdc3](https://www.github.com/googleapis/teeny-request/commit/d9bcdc36a60074fd78718ea8f7c4745d640e3b4f))
+
 ### [7.0.1](https://www.github.com/googleapis/teeny-request/compare/v7.0.0...v7.0.1) (2020-09-29)
 
 
