@@ -357,6 +357,46 @@ describe('teeny', () => {
     });
   });
 
+  it('should accept a Buffer as the body of a request', done => {
+    const scope = nock(uri).post('/', 'hello').reply(200, '🌍');
+    teenyRequest(
+      {uri, method: 'POST', body: Buffer.from('hello')},
+      (error, response, body) => {
+        assert.ifError(error);
+        assert.strictEqual(response.statusCode, 200);
+        assert.strictEqual(body, '🌍');
+        scope.done();
+        done();
+      }
+    );
+  });
+
+  it('should accept a plain string as the body of a request', done => {
+    const scope = nock(uri).post('/', 'hello').reply(200, '🌍');
+    teenyRequest(
+      {uri, method: 'POST', body: 'hello'},
+      (error, response, body) => {
+        assert.ifError(error);
+        assert.strictEqual(response.statusCode, 200);
+        assert.strictEqual(body, '🌍');
+        scope.done();
+        done();
+      }
+    );
+  });
+
+  it('should accept json as the body of a request', done => {
+    const body = {hello: '🌍'};
+    const scope = nock(uri).post('/', JSON.stringify(body)).reply(200, '👋');
+    teenyRequest({uri, method: 'POST', json: body}, (error, response, body) => {
+      assert.ifError(error);
+      assert.strictEqual(response.statusCode, 200);
+      assert.strictEqual(body, '👋');
+      scope.done();
+      done();
+    });
+  });
+
   // TODO multipart is broken with 2 strings
   // see: https://github.com/googleapis/teeny-request/issues/168
   it.skip('should track stats, multipart mode, success', done => {
