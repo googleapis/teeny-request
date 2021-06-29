@@ -119,6 +119,11 @@ function requestToFetchOptions(reqOpts: Options) {
 
   let uri = ((reqOpts as OptionsWithUri).uri ||
     (reqOpts as OptionsWithUrl).url) as string;
+
+  if (!uri) {
+    throw new Error('Missing uri or url in reqOpts.');
+  }
+
   if (reqOpts.useQuerystring === true || typeof reqOpts.qs === 'object') {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const qs = require('querystring');

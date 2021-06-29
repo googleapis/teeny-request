@@ -435,4 +435,26 @@ describe('teeny', () => {
       }
     );
   });
+
+  it('should throw an exception if uri is an empty string', done => {
+    assert.throws(
+      () => {
+        teenyRequest({uri: ''});
+      },
+      /Missing uri or url in reqOpts/,
+      'Did not throw with expected message'
+    );
+    done();
+  });
+
+  it('should throw an exception if url is an empty string', done => {
+    assert.throws(
+      () => {
+        teenyRequest({url: ''});
+      },
+      /Missing uri or url in reqOpts/,
+      'Did not throw with expected message'
+    );
+    done();
+  });
 });
