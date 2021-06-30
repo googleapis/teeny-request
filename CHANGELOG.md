@@ -1,5 +1,12 @@
 # Changelog
 
+### [7.1.1](https://www.github.com/googleapis/teeny-request/compare/v7.1.0...v7.1.1) (2021-06-30)
+
+
+### Bug Fixes
+
+* throw error if missing uri or url ([#239](https://www.github.com/googleapis/teeny-request/issues/239)) ([4d770e3](https://www.github.com/googleapis/teeny-request/commit/4d770e3b89254c4cec30c422cdcdad257500c9cc))
+
 ## [7.1.0](https://www.github.com/googleapis/teeny-request/compare/v7.0.1...v7.1.0) (2021-05-19)
 
 
