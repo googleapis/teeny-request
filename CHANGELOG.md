@@ -1,5 +1,12 @@
 # Changelog
 
+### [7.1.2](https://www.github.com/googleapis/teeny-request/compare/v7.1.1...v7.1.2) (2021-09-10)
+
+
+### Bug Fixes
+
+* **build:** set default branch to main ([#247](https://www.github.com/googleapis/teeny-request/issues/247)) ([db3126d](https://www.github.com/googleapis/teeny-request/commit/db3126df77bc7e6cebb7d092001bbd3a444207d6))
+
 ### [7.1.1](https://www.github.com/googleapis/teeny-request/compare/v7.1.0...v7.1.1) (2021-06-30)
 
 
