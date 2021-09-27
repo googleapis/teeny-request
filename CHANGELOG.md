@@ -1,5 +1,12 @@
 # Changelog
 
+### [7.1.3](https://www.github.com/googleapis/teeny-request/compare/v7.1.2...v7.1.3) (2021-09-24)
+
+
+### Bug Fixes
+
+* **deps:** update dependency http-proxy-agent to v5 ([#253](https://www.github.com/googleapis/teeny-request/issues/253)) ([c84dff4](https://www.github.com/googleapis/teeny-request/commit/c84dff45e4a0e71fc5205838dae51f57f3139c06))
+
 ### [7.1.2](https://www.github.com/googleapis/teeny-request/compare/v7.1.1...v7.1.2) (2021-09-10)
 
 
