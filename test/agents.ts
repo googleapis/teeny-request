@@ -55,16 +55,6 @@ describe('agents', () => {
 
       const noProxyEnvVars = ['no_proxy', 'NO_PROXY'];
 
-      function cleanProxyEnv() {
-        for (const env of noProxyEnvVars) {
-          delete process.env[env];
-        }
-
-        for (const env of envVars) {
-          delete process.env[env];
-        }
-      }
-
       describe('http', () => {
         const uri = httpUri;
         const proxy = 'http://hello.there:8080';
@@ -131,8 +121,9 @@ describe('agents', () => {
         const uri = httpsUri;
         const proxy = 'https://hello.there:8080';
 
-        beforeEach(cleanProxyEnv);
-        afterEach(cleanProxyEnv);
+        beforeEach(() => {
+          sandbox.stub(process, 'env').value({});
+        });
 
         noProxyEnvVars.forEach(noProxEnvVar => {
           it(`should respect the proxy option, even if is in ${noProxEnvVar} env var`, () => {
