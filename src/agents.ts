@@ -26,6 +26,37 @@ export const pool = new Map<string, HTTPAgent>();
 export type HttpAnyAgent = HTTPAgent | HTTPSAgent;
 
 /**
+ * Determines if a proxy should be considered based on the environment.
+ *
+ * @param uri The request uri
+ * @returns {boolean}
+ */
+function shouldUseProxyForURI(uri: string): boolean {
+  const noProxyEnv = process.env.NO_PROXY || process.env.no_proxy;
+  if (!noProxyEnv) {
+    return true;
+  }
+
+  const givenURI = new URL(uri);
+
+  for (const noProxyRaw of noProxyEnv.split(',')) {
+    const noProxy = noProxyRaw.trim();
+
+    if (noProxy === givenURI.origin || noProxy === givenURI.hostname) {
+      return false;
+    } else if (noProxy.startsWith('*.') || noProxy.startsWith('.')) {
+      const noProxyWildcard = noProxy.replace(/^\*\./, '.');
+
+      if (givenURI.hostname.endsWith(noProxyWildcard)) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+/**
  * Returns a custom request Agent if one is found, otherwise returns undefined
  * which will result in the global http(s) Agent being used.
  * @private
@@ -47,7 +78,10 @@ export function getAgent(
 
   const poolOptions = Object.assign({}, reqOpts.pool);
 
-  if (proxy) {
+  const manuallyProvidedProxy = !!reqOpts.proxy;
+  const shouldUseProxy = manuallyProvidedProxy || shouldUseProxyForURI(uri);
+
+  if (proxy && shouldUseProxy) {
     // tslint:disable-next-line variable-name
     const Agent = isHttp
       ? require('http-proxy-agent')
