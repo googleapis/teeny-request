@@ -53,6 +53,18 @@ describe('agents', () => {
         'HTTPS_PROXY',
       ];
 
+      const noProxyEnvVars = ['no_proxy', 'NO_PROXY'];
+
+      function cleanProxyEnv() {
+        for (const env of noProxyEnvVars) {
+          delete process.env[env];
+        }
+
+        for (const env of envVars) {
+          delete process.env[env];
+        }
+      }
+
       describe('http', () => {
         const uri = httpUri;
         const proxy = 'http://hello.there:8080';
@@ -111,6 +123,52 @@ describe('agents', () => {
             const agent = getAgent(uri, defaultOptions);
             assert(agent instanceof HttpsProxyAgent);
             delete process.env[envVar];
+          });
+        });
+      });
+
+      describe('no_proxy', () => {
+        const uri = httpsUri;
+        const proxy = 'https://hello.there:8080';
+
+        beforeEach(cleanProxyEnv);
+        afterEach(cleanProxyEnv);
+
+        noProxyEnvVars.forEach(noProxEnvVar => {
+          it(`should respect the proxy option, even if is in ${noProxEnvVar} env var`, () => {
+            process.env[noProxEnvVar] = new URL(uri).hostname;
+
+            const options = Object.assign({proxy}, defaultOptions);
+            const agent = getAgent(uri, options);
+            assert(agent instanceof HttpsProxyAgent);
+          });
+        });
+
+        noProxyEnvVars.forEach(noProxEnvVar => {
+          envVars.forEach(envVar => {
+            const root = 'example.com';
+            const subDomain = 'abc.' + root;
+
+            const uri = new URL(`https://${subDomain}`);
+
+            const cases = [
+              {name: '`.` support', value: `.${root}`},
+              {name: '`*.` support', value: `*.${root}`},
+              {name: 'list support', value: `a, b,${subDomain},.c,*.d`},
+              {name: '`.` + list support', value: `a, b,.${root},.c,*.d`},
+              {name: '`*.` + list support', value: `a, b,*.${root},.c,*.d`},
+            ];
+
+            for (const {name, value} of cases) {
+              it(`should respect the ${noProxEnvVar} env var > ${envVar}': ${name}`, () => {
+                process.env[envVar] = proxy;
+
+                process.env[noProxEnvVar] = value;
+                const agent = getAgent(uri.toString(), defaultOptions);
+                assert(!(agent instanceof HttpProxyAgent));
+                assert(!(agent instanceof HttpsProxyAgent));
+              });
+            }
           });
         });
       });
