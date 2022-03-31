@@ -26,9 +26,10 @@ export const pool = new Map<string, HTTPAgent>();
 export type HttpAnyAgent = HTTPAgent | HTTPSAgent;
 
 /**
+ * Determines if a proxy should be considered based on the environment.
  *
  * @param uri The request uri
- * @returns
+ * @returns {boolean}
  */
 function shouldUseProxyForURI(uri: string): boolean {
   const noProxyEnv = process.env.NO_PROXY || process.env.no_proxy;
