@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.0](https://github.com/googleapis/teeny-request/compare/v7.1.3...v7.2.0) (2022-03-31)
+
+
+### Features
+
+* Add support for `NO_PROXY` ([#272](https://github.com/googleapis/teeny-request/issues/272)) ([b02b6e5](https://github.com/googleapis/teeny-request/commit/b02b6e515575814bbef7360586d07030b445705d))
+
 ### [7.1.3](https://www.github.com/googleapis/teeny-request/compare/v7.1.2...v7.1.3) (2021-09-24)
 
 
