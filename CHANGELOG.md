@@ -1,5 +1,16 @@
 # Changelog
 
+## [8.0.0](https://github.com/googleapis/teeny-request/compare/v7.2.0...v8.0.0) (2022-05-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop node 10, update typescript to 4.6.3 (#279)
+
+### Build System
+
+* drop node 10, update typescript to 4.6.3 ([#279](https://github.com/googleapis/teeny-request/issues/279)) ([6f12739](https://github.com/googleapis/teeny-request/commit/6f1273993ae667078abae41a8029833749a25e6a))
+
 ## [7.2.0](https://github.com/googleapis/teeny-request/compare/v7.1.3...v7.2.0) (2022-03-31)
 
 
