@@ -19,7 +19,7 @@ import {Agent, AgentOptions as HttpsAgentOptions} from 'https';
 import {AgentOptions as HttpAgentOptions} from 'http';
 import fetch, * as f from 'node-fetch';
 import {PassThrough, Readable} from 'stream';
-import * as uuid from 'uuid';
+import {randomUUID} from 'crypto';
 import {getAgent} from './agents';
 import {TeenyStatistics} from './TeenyStatistics';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -208,7 +208,7 @@ function teenyRequest(
       // TODO: add support for multipart uploads through streaming
       throw new Error('Multipart without callback is not implemented.');
     }
-    const boundary: string = uuid.v4();
+    const boundary: string = randomUUID();
     (options.headers as Headers)[
       'Content-Type'
     ] = `multipart/related; boundary=${boundary}`;
