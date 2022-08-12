@@ -84,7 +84,7 @@ Since 4.0.0, Webpack uses `javascript/esm` for `.mjs` files which handles ESM mo
 ```
 
 ## Motivation
-`request` has a ton of options and features and is accordingly large. Requiering a module incurs load and parse time. For
+`request` has a ton of options and features and is accordingly large. Requiring a module incurs load and parse time. For
 `request`, that is around 600ms.
 
 ![Load time of request measured with require-so-slow](https://user-images.githubusercontent.com/101553/44694187-20357700-aa3a-11e8-9116-b8ae794cbc27.png)
