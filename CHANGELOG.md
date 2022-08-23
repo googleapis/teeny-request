@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.0.1](https://github.com/googleapis/teeny-request/compare/v8.0.0...v8.0.1) (2022-08-23)
+
+
+### Bug Fixes
+
+* remove pip install statements ([#1546](https://github.com/googleapis/teeny-request/issues/1546)) ([#290](https://github.com/googleapis/teeny-request/issues/290)) ([94e7a86](https://github.com/googleapis/teeny-request/commit/94e7a86f13ab380399049e110c648cd381fb1e00))
+
 ## [8.0.0](https://github.com/googleapis/teeny-request/compare/v7.2.0...v8.0.0) (2022-05-09)
 
 
