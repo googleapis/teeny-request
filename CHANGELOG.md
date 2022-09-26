@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.0.2](https://github.com/googleapis/teeny-request/compare/v8.0.1...v8.0.2) (2022-09-09)
+
+
+### Bug Fixes
+
+* **deps:** Update dependency uuid to v9 ([#292](https://github.com/googleapis/teeny-request/issues/292)) ([f9fa756](https://github.com/googleapis/teeny-request/commit/f9fa75647913e2be10a48635168b11520d70982f))
+
 ## [8.0.1](https://github.com/googleapis/teeny-request/compare/v8.0.0...v8.0.1) (2022-08-23)
 
 
