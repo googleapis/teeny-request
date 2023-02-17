@@ -18,7 +18,7 @@
 import {Agent, AgentOptions as HttpsAgentOptions} from 'https';
 import {AgentOptions as HttpAgentOptions} from 'http';
 import fetch, * as f from 'node-fetch';
-import {PassThrough, Readable} from 'stream';
+import {PassThrough, Readable, pipeline} from 'stream';
 import * as uuid from 'uuid';
 import {getAgent} from './agents';
 import {TeenyStatistics} from './TeenyStatistics';
@@ -263,10 +263,10 @@ function teenyRequest(
     let responseStream: any;
     requestStream.once('reading', () => {
       if (responseStream) {
-        responseStream.pipe(requestStream);
+        pipeline(responseStream, requestStream, () => {});
       } else {
         requestStream.once('response', () => {
-          responseStream.pipe(requestStream);
+          pipeline(responseStream, requestStream, () => {});
         });
       }
     });
