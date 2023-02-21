@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.0.3](https://github.com/googleapis/teeny-request/compare/v8.0.2...v8.0.3) (2023-02-17)
+
+
+### Bug Fixes
+
+* Use pipeline in place of pipe to better handle cleanup / errors ([#299](https://github.com/googleapis/teeny-request/issues/299)) ([31d9002](https://github.com/googleapis/teeny-request/commit/31d900227d2ea7cb205fd4dc8db0aed5abd0dfa9))
+
 ## [8.0.2](https://github.com/googleapis/teeny-request/compare/v8.0.1...v8.0.2) (2022-09-09)
 
 
