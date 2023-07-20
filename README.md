@@ -19,7 +19,7 @@ For TypeScript, you can use `@types/request`.
 
 ```ts
 import {teenyRequest as request} from 'teeny-request';
-import r as * from 'request'; // Only for type declarations
+import * as r from 'request'; // Only for type declarations
 
 request({uri: 'http://ip.jsontest.com/'}, (error: any, response: r.Response, body: any) => {
   console.log('error:', error); // Print the error if one occurred
