@@ -1,5 +1,16 @@
 # Changelog
 
+## [9.0.0](https://github.com/googleapis/teeny-request/compare/v8.0.3...v9.0.0) (2023-07-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* move minimum version to node 14 ([#312](https://github.com/googleapis/teeny-request/issues/312))
+
+### Miscellaneous Chores
+
+* Move minimum version to node 14 ([#312](https://github.com/googleapis/teeny-request/issues/312)) ([e30cf76](https://github.com/googleapis/teeny-request/commit/e30cf765fb7997e36cf7cc8144dfe8480d12c58b))
+
 ## [8.0.3](https://github.com/googleapis/teeny-request/compare/v8.0.2...v8.0.3) (2023-02-17)
 
 
