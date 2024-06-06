@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-methods": "^7.18.6",
-    "@compodoc/compodoc": "^1.1.9",
+    "@compodoc/compodoc": "^1.1.19",
     "@types/mocha": "^10.0.0",
     "@types/node-fetch": "^2.5.7",
     "@types/sinon": "^17.0.0",
@@ -54,7 +54,7 @@
     "c8": "^9.0.0",
     "codecov": "^3.1.0",
     "gts": "^5.0.0",
-    "linkinator": "^4.0.0",
+    "linkinator": "^3.0.0",
     "mocha": "^10.0.0",
     "nock": "^13.0.0",
     "sinon": "^17.0.0",
