@@ -209,9 +209,8 @@ function teenyRequest(
       throw new Error('Multipart without callback is not implemented.');
     }
     const boundary: string = uuid.v4();
-    (options.headers as Headers)[
-      'Content-Type'
-    ] = `multipart/related; boundary=${boundary}`;
+    (options.headers as Headers)['Content-Type'] =
+      `multipart/related; boundary=${boundary}`;
     options.body = createMultipartStream(boundary, multipart);
 
     // Multipart upload
