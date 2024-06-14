@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/googleapis/teeny-request.svg?branch=master)](https://travis-ci.org/googleapis/teeny-request)
 
+**_THIS REPOSITORY AND PACKAGE WILL BE DEPRECATED IN JULY 2024. RELEVANT FUNCTIONALITIES HAVE BEEN MOVED TO [GOOGLEAPIS/GAXIOS](https://github.com/googleapis/gaxios)_**
+
 # teeny-request 
 
 Like `request`, but much smaller - and with less options. Uses `node-fetch` under the hood. 
