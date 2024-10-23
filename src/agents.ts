@@ -17,7 +17,7 @@
 
 import {Agent as HTTPAgent} from 'http';
 import {Agent as HTTPSAgent} from 'https';
-// eslint-disable-next-line node/no-deprecated-api
+// eslint-disable-next-line n/no-deprecated-api
 import {parse} from 'url';
 import {Options} from './';
 
