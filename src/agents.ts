@@ -66,7 +66,7 @@ function shouldUseProxyForURI(uri: string): boolean {
  */
 export function getAgent(
   uri: string,
-  reqOpts: Options
+  reqOpts: Options,
 ): HttpAnyAgent | undefined {
   const isHttp = uri.startsWith('http://');
   const proxy =

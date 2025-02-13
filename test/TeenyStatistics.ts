@@ -65,7 +65,7 @@ describe('TeenyStatistics', () => {
     it('should have default concurrent requests', () => {
       assert.strictEqual(
         TeenyStatistics.DEFAULT_WARN_CONCURRENT_REQUESTS,
-        5000
+        5000,
       );
     });
 
@@ -231,8 +231,8 @@ describe('TeenyStatistics', () => {
       t.requestStarting();
       assert(
         emitWarnStub.calledOnceWith(
-          sinon.match.instanceOf(TeenyStatisticsWarning)
-        )
+          sinon.match.instanceOf(TeenyStatisticsWarning),
+        ),
       );
     });
 
@@ -246,8 +246,8 @@ describe('TeenyStatistics', () => {
       t.requestStarting();
       assert(
         emitWarnStub.calledOnceWith(
-          sinon.match.instanceOf(TeenyStatisticsWarning)
-        )
+          sinon.match.instanceOf(TeenyStatisticsWarning),
+        ),
       );
 
       // shouldn't emit on the next call (i.e. still greater than threshold)
@@ -271,8 +271,8 @@ describe('TeenyStatistics', () => {
       t.requestStarting();
       assert(
         emitWarnStub.calledOnceWith(
-          sinon.match.instanceOf(TeenyStatisticsWarning)
-        )
+          sinon.match.instanceOf(TeenyStatisticsWarning),
+        ),
       );
 
       // let's bring the counter back down
@@ -298,7 +298,7 @@ describe('TeenyStatistics', () => {
       assert.strictEqual(warning.value, 5e3);
       assert.strictEqual(
         warning.type,
-        TeenyStatisticsWarning.CONCURRENT_REQUESTS
+        TeenyStatisticsWarning.CONCURRENT_REQUESTS,
       );
     });
 
@@ -311,15 +311,15 @@ describe('TeenyStatistics', () => {
       const errStr: string = emitWarnStub.firstCall.args[0].toString();
       assert(
         errStr.includes('Possible excessive concurrent requests detected.'),
-        'describes the nature of the warning'
+        'describes the nature of the warning',
       );
       assert(
         errStr.includes('TEENY_REQUEST_WARN_CONCURRENT_REQUESTS'),
-        'mentions env var'
+        'mentions env var',
       );
       assert(
         errStr.includes('concurrentRequests'),
-        'mentions concurrentRequests option'
+        'mentions concurrentRequests option',
       );
       assert(errStr.search(/\b0\b/) !== -1, 'mentions 0');
     });
