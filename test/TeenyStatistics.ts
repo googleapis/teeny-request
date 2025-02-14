@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import {afterEach, before, beforeEach, describe, it} from 'mocha';
 import * as sinon from 'sinon';
 import {

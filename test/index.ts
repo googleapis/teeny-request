@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import {describe, it, afterEach, beforeEach} from 'mocha';
-import * as nock from 'nock';
+import nock from 'nock';
 import {Readable, PassThrough} from 'stream';
 import * as sinon from 'sinon';
 import {teenyRequest} from '../src';
@@ -65,18 +65,18 @@ describe('teeny', () => {
     nock.cleanAll();
   });
 
-  it('should get JSON', done => {
+  it('should get JSON', async () => {
     const scope = mockJson();
     teenyRequest({uri}, (error, response, body) => {
       assert.ifError(error);
       assert.strictEqual(response.statusCode, 200);
       assert.ok(body.hello);
       scope.done();
-      done();
+      // done();
     });
   });
 
-  it('should set defaults', done => {
+  it('should set defaults', async () => {
     const scope = mockJson();
     const defaultRequest = teenyRequest.defaults({timeout: 60000});
     defaultRequest({uri}, (error, response, body) => {
@@ -84,11 +84,10 @@ describe('teeny', () => {
       assert.strictEqual(response.statusCode, 200);
       assert.ok(body.hello);
       scope.done();
-      done();
     });
   });
 
-  it('response event emits object compatible with request module', done => {
+  it('response event emits object compatible with request module', async () => {
     const reqHeaders = {fruit: 'banana'};
     const resHeaders = {veggies: 'carrots'};
     const scope = nock(uri).get('/').reply(202, 'ok', resHeaders);
@@ -103,12 +102,13 @@ describe('teeny', () => {
         });
         assert(res instanceof Readable);
         scope.done();
-        done();
       })
-      .on('error', done);
+      .on('error', err => {
+        throw err;
+      });
   });
 
-  it('should include the request in the response', done => {
+  it('should include the request in the response', async () => {
     const path = '/?dessert=pie';
     const scope = nock(uri).get(path).reply(202);
     const headers = {dinner: 'tacos'};
@@ -119,11 +119,10 @@ describe('teeny', () => {
       assert.deepStrictEqual(req.headers, headers);
       assert.strictEqual(req.href, url);
       scope.done();
-      done();
     });
   });
 
-  it('should not wrap the error', done => {
+  it('should not wrap the error', async () => {
     const scope = nock(uri)
       .get('/')
       .reply(200, '🚨', {'content-type': 'application/json'});
@@ -131,11 +130,10 @@ describe('teeny', () => {
       assert.ok(err);
       assert.ok(err!.message.match(/^invalid json response body/));
       scope.done();
-      done();
     });
   });
 
-  it('should include headers in the response', done => {
+  it('should include headers in the response', async () => {
     const headers = {dinner: 'tacos'};
     const body = {hello: '🌍'};
     const scope = nock(uri).get('/').reply(200, body, headers);
@@ -143,22 +141,20 @@ describe('teeny', () => {
       assert.ifError(err);
       assert.strictEqual(headers['dinner'], res.headers['dinner']);
       scope.done();
-      done();
     });
   });
 
-  it('should accept the forever option', done => {
+  it('should accept the forever option', async () => {
     const scope = nock(uri).get('/').reply(200);
     teenyRequest({uri, forever: true}, (err, res) => {
       assert.ifError(err);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       assert.strictEqual((res.request.agent as any).keepAlive, true);
       scope.done();
-      done();
     });
   });
 
-  it('should allow setting compress/gzip to true', done => {
+  it('should allow setting compress/gzip to true', async () => {
     const reqheaders = {
       'Accept-Encoding': 'gzip,deflate',
     };
@@ -168,11 +164,10 @@ describe('teeny', () => {
     teenyRequest({uri, gzip: true}, err => {
       assert.ifError(err);
       scope.done();
-      done();
     });
   });
 
-  it('should allow setting compress/gzip to false', done => {
+  it('should allow setting compress/gzip to false', async () => {
     const badheaders = ['Accept-Encoding'];
 
     const scope = nock(uri, {badheaders}).get('/').reply(200);
@@ -180,13 +175,12 @@ describe('teeny', () => {
     teenyRequest({uri, gzip: false}, err => {
       assert.ifError(err);
       scope.done();
-      done();
     });
   });
 
   const envVars = ['http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY'];
   for (const v of envVars) {
-    it(`should respect ${v} environment variable for proxy config`, done => {
+    it(`should respect ${v} environment variable for proxy config`, () => {
       sandbox.stub(process, 'env').value({[v]: 'https://fake.proxy'});
       const expectedBody = {hello: '🌎'};
       const scope = nock(uri).get('/').reply(200, expectedBody);
@@ -195,12 +189,12 @@ describe('teeny', () => {
         assert.ifError(err);
         assert.deepStrictEqual(expectedBody, body);
         assert.ok(res.request.agent instanceof HttpsProxyAgent);
-        return done();
+        return;
       });
     });
   }
 
-  it('should create http proxy if upstream scheme is http', done => {
+  it('should create http proxy if upstream scheme is http', async () => {
     sandbox.stub(process, 'env').value({http_proxy: 'https://fake.proxy'});
     const expectedBody = {hello: '🌎'};
     const scope = nock('http://example.com').get('/').reply(200, expectedBody);
@@ -209,11 +203,11 @@ describe('teeny', () => {
       assert.ifError(err);
       assert.deepStrictEqual(expectedBody, body);
       assert.ok(res.request.agent instanceof HttpProxyAgent);
-      return done();
+      return;
     });
   });
 
-  it('should use proxy if set in request options', done => {
+  it('should use proxy if set in request options', async () => {
     const expectedBody = {hello: '🌎'};
     const scope = nock(uri).get('/').reply(200, expectedBody);
     teenyRequest({uri, proxy: 'https://fake.proxy'}, (err, res, body) => {
@@ -221,44 +215,51 @@ describe('teeny', () => {
       assert.ifError(err);
       assert.deepStrictEqual(expectedBody, body);
       assert.ok(res.request.agent instanceof HttpsProxyAgent);
-      return done();
+      return;
     });
   });
 
   // see: https://github.com/googleapis/nodejs-storage/issues/798
-  it('should not throw exception when piped through pumpify', async () => {
+  it.only('should not throw exception when piped through pumpify', async () => {
     const scope = mockJson();
+    console.log('A');
     const stream = teenyRequest({uri}).pipe(new PassThrough());
+    console.log(stream);
     let content = '';
     for await (const data of stream) {
+      console.log(data);
       content += data;
     }
+    console.log(content);
     assert.deepStrictEqual(JSON.parse(content), {hello: '🌍'});
     scope.done();
   });
 
-  it('should emit response event when called without callback', done => {
+  it('should emit response event when called without callback', async () => {
     const scope = mockJson();
     teenyRequest({uri}).on('response', res => {
       assert.ok(res);
       scope.done();
-      return done();
+      return;
     });
   });
 
-  it('should pipe response stream to user', done => {
+  it('should pipe response stream to user', () => {
     const scope = mockJson();
     teenyRequest({uri})
-      .on('error', done)
+      .on('error', err => {
+        throw err;
+      })
       .on('data', () => {
         scope.done();
-        done();
       });
   });
 
-  it('should not pipe response stream to user unless they ask for it', done => {
+  it('should not pipe response stream to user unless they ask for it', async () => {
     const scope = mockJson();
-    const stream = teenyRequest({uri}).on('error', done);
+    const stream = teenyRequest({uri}).on('error', err => {
+      throw err;
+    });
     stream.on('response', responseStream => {
       // We are using an internal property of Readable to get the number of
       // active readers. The property changed from `pipesCount: number` in
@@ -273,7 +274,6 @@ describe('teeny', () => {
           responseStream.body._readableState.pipes?.length;
         assert.strictEqual(numPipes, 1);
         scope.done();
-        done();
       });
     });
   });
@@ -298,7 +298,7 @@ describe('teeny', () => {
     assert.deepStrictEqual(newOptions, {concurrentRequests: 42});
   });
 
-  it('should emit warning on too many concurrent requests', done => {
+  it('should emit warning on too many concurrent requests', () => {
     statsStub.setOptions.restore();
     statsStub.requestStarting.restore();
     teenyRequest.stats.setOptions({concurrentRequests: 1});
@@ -307,32 +307,29 @@ describe('teeny', () => {
     teenyRequest({uri}, () => {
       assert.ok(emitWarnStub.calledOnce);
       scope.done();
-      done();
     });
   });
 
-  it('should track stats, callback mode, success', done => {
+  it('should track stats, callback mode, success', () => {
     const scope = mockJson();
     teenyRequest({uri}, () => {
       assert.ok(statsStub.requestStarting.calledOnceWithExactly());
       assert.ok(statsStub.requestFinished.calledOnceWithExactly());
       scope.done();
-      done();
     });
   });
 
-  it('should track stats, callback mode, failure', done => {
+  it('should track stats, callback mode, failure', () => {
     const scope = mockError();
     teenyRequest({uri}, err => {
       assert.ok(err);
       assert.ok(statsStub.requestStarting.calledOnceWithExactly());
       assert.ok(statsStub.requestFinished.calledOnceWithExactly());
       scope.done();
-      done();
     });
   });
 
-  it('should track stats, stream mode, success', done => {
+  it('should track stats, stream mode, success', () => {
     const scope = mockJson();
     const readable = teenyRequest({uri});
     assert.ok(statsStub.requestStarting.calledOnceWithExactly());
@@ -340,11 +337,10 @@ describe('teeny', () => {
     readable.once('response', () => {
       assert.ok(statsStub.requestFinished.calledOnceWithExactly());
       scope.done();
-      done();
     });
   });
 
-  it('should track stats, stream mode, failure', done => {
+  it('should track stats, stream mode, failure', () => {
     const scope = mockError();
     const readable = teenyRequest({uri});
     assert.ok(statsStub.requestStarting.calledOnceWithExactly());
@@ -353,11 +349,10 @@ describe('teeny', () => {
       assert.ok(err);
       assert.ok(statsStub.requestFinished.calledOnceWithExactly());
       scope.done();
-      done();
     });
   });
 
-  it('should accept a Buffer as the body of a request', done => {
+  it('should accept a Buffer as the body of a request', () => {
     const scope = nock(uri).post('/', 'hello').reply(200, '🌍');
     teenyRequest(
       {uri, method: 'POST', body: Buffer.from('hello')},
@@ -366,12 +361,11 @@ describe('teeny', () => {
         assert.strictEqual(response.statusCode, 200);
         assert.strictEqual(body, '🌍');
         scope.done();
-        done();
       },
     );
   });
 
-  it('should accept a plain string as the body of a request', done => {
+  it('should accept a plain string as the body of a request', () => {
     const scope = nock(uri).post('/', 'hello').reply(200, '🌍');
     teenyRequest(
       {uri, method: 'POST', body: 'hello'},
@@ -380,12 +374,11 @@ describe('teeny', () => {
         assert.strictEqual(response.statusCode, 200);
         assert.strictEqual(body, '🌍');
         scope.done();
-        done();
       },
     );
   });
 
-  it('should accept json as the body of a request', done => {
+  it('should accept json as the body of a request', () => {
     const body = {hello: '🌍'};
     const scope = nock(uri).post('/', JSON.stringify(body)).reply(200, '👋');
     teenyRequest({uri, method: 'POST', json: body}, (error, response, body) => {
@@ -393,7 +386,6 @@ describe('teeny', () => {
       assert.strictEqual(response.statusCode, 200);
       assert.strictEqual(body, '👋');
       scope.done();
-      done();
     });
   });
 
@@ -417,7 +409,7 @@ describe('teeny', () => {
     );
   });
 
-  it.skip('should track stats, multipart mode, failure', done => {
+  it.skip('should track stats, multipart mode, failure', () => {
     const scope = mockError();
     teenyRequest(
       {
@@ -431,12 +423,11 @@ describe('teeny', () => {
         assert.ok(statsStub.requestStarting.calledOnceWithExactly());
         assert.ok(statsStub.requestFinished.calledOnceWithExactly());
         scope.done();
-        done();
       },
     );
   });
 
-  it('should throw an exception if uri is an empty string', done => {
+  it('should throw an exception if uri is an empty string', () => {
     assert.throws(
       () => {
         teenyRequest({uri: ''});
@@ -444,10 +435,9 @@ describe('teeny', () => {
       /Missing uri or url in reqOpts/,
       'Did not throw with expected message',
     );
-    done();
   });
 
-  it('should throw an exception if url is an empty string', done => {
+  it('should throw an exception if url is an empty string', () => {
     assert.throws(
       () => {
         teenyRequest({url: ''});
@@ -455,6 +445,5 @@ describe('teeny', () => {
       /Missing uri or url in reqOpts/,
       'Did not throw with expected message',
     );
-    done();
   });
 });

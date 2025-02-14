@@ -40,7 +40,7 @@
   "dependencies": {
     "http-proxy-agent": "^5.0.0",
     "https-proxy-agent": "^5.0.0",
-    "node-fetch": "^2.7.0",
+    "node-fetch": "^3.3.2",
     "stream-events": "^1.0.5",
     "uuid": "^11.0.5"
   },

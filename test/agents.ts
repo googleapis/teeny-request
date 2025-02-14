@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import {describe, it, afterEach} from 'mocha';
 import * as http from 'http';
 import * as https from 'https';
