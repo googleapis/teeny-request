@@ -362,7 +362,7 @@ describe('teeny', () => {
         assert.strictEqual(response.statusCode, 200);
         assert.strictEqual(body, '🌍');
         scope.done();
-      },
+      }
     );
   });
 
@@ -375,7 +375,7 @@ describe('teeny', () => {
         assert.strictEqual(response.statusCode, 200);
         assert.strictEqual(body, '🌍');
         scope.done();
-      },
+      }
     );
   });
 
@@ -406,7 +406,7 @@ describe('teeny', () => {
         assert.ok(statsStub.requestFinished.calledOnceWithExactly());
         scope.done();
         done();
-      },
+      }
     );
   });
 
@@ -424,7 +424,7 @@ describe('teeny', () => {
         assert.ok(statsStub.requestStarting.calledOnceWithExactly());
         assert.ok(statsStub.requestFinished.calledOnceWithExactly());
         scope.done();
-      },
+      }
     );
   });
 
@@ -434,7 +434,7 @@ describe('teeny', () => {
         teenyRequest({uri: ''});
       },
       /Missing uri or url in reqOpts/,
-      'Did not throw with expected message',
+      'Did not throw with expected message'
     );
   });
 
@@ -444,7 +444,7 @@ describe('teeny', () => {
         teenyRequest({url: ''});
       },
       /Missing uri or url in reqOpts/,
-      'Did not throw with expected message',
+      'Did not throw with expected message'
     );
   });
 });
