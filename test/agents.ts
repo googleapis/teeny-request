@@ -211,7 +211,7 @@ describe('agents', () => {
                 maxSockets: 1000,
               },
             },
-            defaultOptions
+            defaultOptions,
           );
           const agent = getAgent(uri, options);
           assert.strictEqual(agent!.maxSockets, 1000);
@@ -224,7 +224,7 @@ describe('agents', () => {
                 maxSockets: 1000,
               },
             },
-            defaultOptions
+            defaultOptions,
           );
           const agent = getAgent(uri, options);
           assert.strictEqual(agent, undefined);
@@ -243,7 +243,7 @@ describe('agents', () => {
                 maxSockets: 1000,
               },
             },
-            defaultOptions
+            defaultOptions,
           );
           const agent = getAgent(uri, options);
           assert.strictEqual(agent!.maxSockets, 1000);
@@ -256,7 +256,7 @@ describe('agents', () => {
                 maxSockets: 1000,
               },
             },
-            defaultOptions
+            defaultOptions,
           );
           const agent = getAgent(uri, options);
           assert.strictEqual(agent, undefined);
