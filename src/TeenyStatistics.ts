@@ -153,7 +153,7 @@ export class TeenyStatistics {
           this._options.concurrentRequests +
           '. Use the TEENY_REQUEST_WARN_CONCURRENT_REQUESTS environment ' +
           'variable or the concurrentRequests option of teeny-request to ' +
-          'increase or disable (0) this warning.',
+          'increase or disable (0) this warning.'
       );
       warning.type = TeenyStatisticsWarning.CONCURRENT_REQUESTS;
       warning.value = this._concurrentRequests;
@@ -187,7 +187,7 @@ export class TeenyStatistics {
     let concurrentRequests = this.DEFAULT_WARN_CONCURRENT_REQUESTS;
 
     const envConcurrentRequests = Number(
-      process.env.TEENY_REQUEST_WARN_CONCURRENT_REQUESTS,
+      process.env.TEENY_REQUEST_WARN_CONCURRENT_REQUESTS
     );
     if (diConcurrentRequests !== undefined) {
       concurrentRequests = diConcurrentRequests;
