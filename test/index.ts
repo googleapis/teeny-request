@@ -18,7 +18,7 @@
 import assert from 'assert';
 import {describe, it, afterEach, beforeEach} from 'mocha';
 import nock from 'nock';
-import {Readable, PassThrough} from 'stream';
+import {Readable} from 'stream';
 import * as sinon from 'sinon';
 import {teenyRequest} from '../src';
 import {TeenyStatistics, TeenyStatisticsWarning} from '../src/TeenyStatistics';
@@ -220,18 +220,19 @@ describe('teeny', () => {
   });
 
   // see: https://github.com/googleapis/nodejs-storage/issues/798
-  it.only('should not throw exception when piped through pumpify', async () => {
+  it('should not throw exception when piped through pumpify', async () => {
     const scope = mockJson();
-    console.log('A');
-    const stream = teenyRequest({uri}).pipe(new PassThrough());
-    console.log(stream);
-    let content = '';
+    const stream = teenyRequest({uri});
+    // set the encoding for the returned stream
+    stream.setEncoding('utf8');
+
+    // collect the buffers, then concat later for performance
+    const content: string[] = [];
     for await (const data of stream) {
-      console.log(data);
-      content += data;
+      content.push(data);
     }
-    console.log(content);
-    assert.deepStrictEqual(JSON.parse(content), {hello: '🌍'});
+
+    assert.deepStrictEqual(JSON.parse(content.join('')), {hello: '🌍'});
     scope.done();
   });
 
@@ -361,7 +362,7 @@ describe('teeny', () => {
         assert.strictEqual(response.statusCode, 200);
         assert.strictEqual(body, '🌍');
         scope.done();
-      },
+      }
     );
   });
 
@@ -374,7 +375,7 @@ describe('teeny', () => {
         assert.strictEqual(response.statusCode, 200);
         assert.strictEqual(body, '🌍');
         scope.done();
-      },
+      }
     );
   });
 
@@ -405,7 +406,7 @@ describe('teeny', () => {
         assert.ok(statsStub.requestFinished.calledOnceWithExactly());
         scope.done();
         done();
-      },
+      }
     );
   });
 
@@ -423,7 +424,7 @@ describe('teeny', () => {
         assert.ok(statsStub.requestStarting.calledOnceWithExactly());
         assert.ok(statsStub.requestFinished.calledOnceWithExactly());
         scope.done();
-      },
+      }
     );
   });
 
@@ -433,7 +434,7 @@ describe('teeny', () => {
         teenyRequest({uri: ''});
       },
       /Missing uri or url in reqOpts/,
-      'Did not throw with expected message',
+      'Did not throw with expected message'
     );
   });
 
@@ -443,7 +444,7 @@ describe('teeny', () => {
         teenyRequest({url: ''});
       },
       /Missing uri or url in reqOpts/,
-      'Did not throw with expected message',
+      'Did not throw with expected message'
     );
   });
 });

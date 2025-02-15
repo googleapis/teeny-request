@@ -24,8 +24,11 @@ import {getAgent} from './agents';
 import {TeenyStatistics} from './TeenyStatistics';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const streamEvents = require('stream-events');
-const fetch = (...args: any[]) =>
-  import('node-fetch').then(({default: fetch}) => fetch([...args] as any));
+
+import type nodeFetch from 'node-fetch' with {'resolution-mode': 'import'};
+
+const fetch = (...args: Parameters<typeof nodeFetch>) =>
+  import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 export interface CoreOptions {
   method?: string;
@@ -154,7 +157,7 @@ function fetchToRequestResponse(opts: f.RequestInit, res: f.Response) {
   const resHeaders = {} as Headers;
   res.headers.forEach((value, key) => (resHeaders[key] = value));
 
-  const response = Object.assign(res.body as any, {
+  const response = Object.assign(res.body as {}, {
     statusCode: res.status,
     statusMessage: res.statusText,
     request,
