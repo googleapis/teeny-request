@@ -202,7 +202,7 @@ function teenyRequest(reqOpts: Options): Request;
 function teenyRequest(reqOpts: Options, callback: RequestCallback): void;
 function teenyRequest(
   reqOpts: Options,
-  callback?: RequestCallback,
+  callback?: RequestCallback
 ): Request | void {
   const {uri, options} = requestToFetchOptions(reqOpts);
 
@@ -236,7 +236,7 @@ function teenyRequest(
             },
             (err: Error) => {
               callback(err, response, body);
-            },
+            }
           );
           return;
         }
@@ -248,13 +248,13 @@ function teenyRequest(
           },
           err => {
             callback(err, response, body);
-          },
+          }
         );
       },
       err => {
         teenyRequest.stats.requestFinished();
         callback(err, null!, null);
-      },
+      }
     );
     return;
   }
@@ -291,7 +291,7 @@ function teenyRequest(
       err => {
         teenyRequest.stats.requestFinished();
         requestStream.emit('error', err);
-      },
+      }
     );
 
     // fetch doesn't supply the raw HTTP stream, instead it
@@ -324,7 +324,7 @@ function teenyRequest(
           },
           err => {
             callback(err, response, body);
-          },
+          }
         );
         return;
       }
@@ -337,13 +337,13 @@ function teenyRequest(
         },
         err => {
           callback(err, response, body);
-        },
+        }
       );
     },
     err => {
       teenyRequest.stats.requestFinished();
       callback(err, null!, null);
-    },
+    }
   );
   return;
 }
