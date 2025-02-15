@@ -1,5 +1,16 @@
 # Changelog
 
+## [10.0.0](https://github.com/googleapis/teeny-request/compare/v9.0.0...v10.0.0) (2025-02-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade to Node 18 ([#353](https://github.com/googleapis/teeny-request/issues/353))
+
+### Miscellaneous Chores
+
+* Upgrade to Node 18 ([#353](https://github.com/googleapis/teeny-request/issues/353)) ([4a5c834](https://github.com/googleapis/teeny-request/commit/4a5c834451a5649f68301385356677d8b3809054))
+
 ## [9.0.0](https://github.com/googleapis/teeny-request/compare/v8.0.3...v9.0.0) (2023-07-20)
 
 
