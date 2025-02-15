@@ -21,6 +21,7 @@ import type * as f from 'node-fetch' with {'resolution-mode': 'import'};
 import {PassThrough, Readable, pipeline} from 'stream';
 import {getAgent} from './agents';
 import {TeenyStatistics} from './TeenyStatistics';
+import {randomUUID} from 'crypto';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const streamEvents = require('stream-events');
 
@@ -202,7 +203,7 @@ function teenyRequest(reqOpts: Options): Request;
 function teenyRequest(reqOpts: Options, callback: RequestCallback): void;
 function teenyRequest(
   reqOpts: Options,
-  callback?: RequestCallback
+  callback?: RequestCallback,
 ): Request | void {
   const {uri, options} = requestToFetchOptions(reqOpts);
 
@@ -212,7 +213,7 @@ function teenyRequest(
       // TODO: add support for multipart uploads through streaming
       throw new Error('Multipart without callback is not implemented.');
     }
-    const boundary: string = globalThis.crypto?.randomUUID();
+    const boundary: string = randomUUID();
     (options.headers as Headers)['Content-Type'] =
       `multipart/related; boundary=${boundary}`;
     options.body = createMultipartStream(boundary, multipart);
@@ -236,7 +237,7 @@ function teenyRequest(
             },
             (err: Error) => {
               callback(err, response, body);
-            }
+            },
           );
           return;
         }
@@ -248,13 +249,13 @@ function teenyRequest(
           },
           err => {
             callback(err, response, body);
-          }
+          },
         );
       },
       err => {
         teenyRequest.stats.requestFinished();
         callback(err, null!, null);
-      }
+      },
     );
     return;
   }
@@ -291,7 +292,7 @@ function teenyRequest(
       err => {
         teenyRequest.stats.requestFinished();
         requestStream.emit('error', err);
-      }
+      },
     );
 
     // fetch doesn't supply the raw HTTP stream, instead it
@@ -324,7 +325,7 @@ function teenyRequest(
           },
           err => {
             callback(err, response, body);
-          }
+          },
         );
         return;
       }
@@ -337,13 +338,13 @@ function teenyRequest(
         },
         err => {
           callback(err, response, body);
-        }
+        },
       );
     },
     err => {
       teenyRequest.stats.requestFinished();
       callback(err, null!, null);
-    }
+    },
   );
   return;
 }
