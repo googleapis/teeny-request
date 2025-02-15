@@ -17,13 +17,18 @@
 
 import {Agent, AgentOptions as HttpsAgentOptions} from 'https';
 import {AgentOptions as HttpAgentOptions} from 'http';
-import fetch, * as f from 'node-fetch';
+import type * as f from 'node-fetch' with {'resolution-mode': 'import'};
 import {PassThrough, Readable, pipeline} from 'stream';
-import * as uuid from 'uuid';
 import {getAgent} from './agents';
 import {TeenyStatistics} from './TeenyStatistics';
+import {randomUUID} from 'crypto';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const streamEvents = require('stream-events');
+
+import type nodeFetch from 'node-fetch' with {'resolution-mode': 'import'};
+
+const fetch = (...args: Parameters<typeof nodeFetch>) =>
+  import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 export interface CoreOptions {
   method?: string;
@@ -152,7 +157,7 @@ function fetchToRequestResponse(opts: f.RequestInit, res: f.Response) {
   const resHeaders = {} as Headers;
   res.headers.forEach((value, key) => (resHeaders[key] = value));
 
-  const response = Object.assign(res.body, {
+  const response = Object.assign(res.body as {}, {
     statusCode: res.status,
     statusMessage: res.statusText,
     request,
@@ -198,7 +203,7 @@ function teenyRequest(reqOpts: Options): Request;
 function teenyRequest(reqOpts: Options, callback: RequestCallback): void;
 function teenyRequest(
   reqOpts: Options,
-  callback?: RequestCallback
+  callback?: RequestCallback,
 ): Request | void {
   const {uri, options} = requestToFetchOptions(reqOpts);
 
@@ -208,7 +213,7 @@ function teenyRequest(
       // TODO: add support for multipart uploads through streaming
       throw new Error('Multipart without callback is not implemented.');
     }
-    const boundary: string = uuid.v4();
+    const boundary: string = randomUUID();
     (options.headers as Headers)['Content-Type'] =
       `multipart/related; boundary=${boundary}`;
     options.body = createMultipartStream(boundary, multipart);
@@ -232,7 +237,7 @@ function teenyRequest(
             },
             (err: Error) => {
               callback(err, response, body);
-            }
+            },
           );
           return;
         }
@@ -244,13 +249,13 @@ function teenyRequest(
           },
           err => {
             callback(err, response, body);
-          }
+          },
         );
       },
       err => {
         teenyRequest.stats.requestFinished();
         callback(err, null!, null);
-      }
+      },
     );
     return;
   }
@@ -287,7 +292,7 @@ function teenyRequest(
       err => {
         teenyRequest.stats.requestFinished();
         requestStream.emit('error', err);
-      }
+      },
     );
 
     // fetch doesn't supply the raw HTTP stream, instead it
@@ -320,7 +325,7 @@ function teenyRequest(
           },
           err => {
             callback(err, response, body);
-          }
+          },
         );
         return;
       }
@@ -333,13 +338,13 @@ function teenyRequest(
         },
         err => {
           callback(err, response, body);
-        }
+        },
       );
     },
     err => {
       teenyRequest.stats.requestFinished();
       callback(err, null!, null);
-    }
+    },
   );
   return;
 }
