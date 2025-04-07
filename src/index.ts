@@ -105,7 +105,11 @@ function requestToFetchOptions(reqOpts: Options) {
   if (typeof reqOpts.json === 'object') {
     // Add Content-type: application/json header
     reqOpts.headers = reqOpts.headers || {};
-    reqOpts.headers['Content-Type'] = 'application/json';
+    if (reqOpts.headers instanceof globalThis.Headers) {
+      reqOpts.headers.set('Content-Type', 'application/json');
+    } else {
+      reqOpts.headers['Content-Type'] = 'application/json';
+    }
 
     // Set body to JSON representation of value
     options.body = JSON.stringify(reqOpts.json);
@@ -119,8 +123,15 @@ function requestToFetchOptions(reqOpts: Options) {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  options.headers = reqOpts.headers as any;
+  if (reqOpts.headers instanceof globalThis.Headers) {
+    options.headers = {};
+    for (const pair of reqOpts.headers.entries()) {
+      options.headers[pair[0]] = pair[1];
+    }
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    options.headers = reqOpts.headers as any;
+  }
 
   let uri = ((reqOpts as OptionsWithUri).uri ||
     (reqOpts as OptionsWithUrl).url) as string;

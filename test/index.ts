@@ -144,6 +144,26 @@ describe('teeny', () => {
     });
   });
 
+  it.only('should accept fetch Headers', done => {
+    const body = {dish: '🍕'};
+    const scope = nock(uri)
+      .post('/')
+      .matchHeader('dinner', 'pizza')
+      .matchHeader('content-type', 'application/json')
+      .reply(200, body, {country: 'Italy'});
+
+    const headers = new Headers();
+    headers.set('dinner', 'pizza');
+    teenyRequest({uri, headers, json: body, method: 'POST'}, (err, res) => {
+      assert.ifError(err);
+      console.log('headers', res.headers);
+      assert.strictEqual(res.headers['country'], 'Italy');
+      assert.strictEqual(res.headers['content-type'], 'application/json');
+      scope.done();
+      done();
+    });
+  });
+
   it('should accept the forever option', async () => {
     const scope = nock(uri).get('/').reply(200);
     teenyRequest({uri, forever: true}, (err, res) => {
