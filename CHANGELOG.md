@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.1.0](https://github.com/googleapis/teeny-request/compare/v10.0.0...v10.1.0) (2025-04-07)
+
+
+### Features
+
+* Support fetch Headers class ([#359](https://github.com/googleapis/teeny-request/issues/359)) ([e9b1577](https://github.com/googleapis/teeny-request/commit/e9b1577f921a48f7947d4df26ab93747bf6b61d8))
+
 ## [10.0.0](https://github.com/googleapis/teeny-request/compare/v9.0.0...v10.0.0) (2025-02-15)
 
 
