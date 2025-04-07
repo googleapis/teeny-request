@@ -144,7 +144,7 @@ describe('teeny', () => {
     });
   });
 
-  it.only('should accept fetch Headers', done => {
+  it('should accept fetch Headers', done => {
     const body = {dish: '🍕'};
     const scope = nock(uri)
       .post('/')
