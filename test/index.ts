@@ -156,7 +156,6 @@ describe('teeny', () => {
     headers.set('dinner', 'pizza');
     teenyRequest({uri, headers, json: body, method: 'POST'}, (err, res) => {
       assert.ifError(err);
-      console.log('headers', res.headers);
       assert.strictEqual(res.headers['country'], 'Italy');
       assert.strictEqual(res.headers['content-type'], 'application/json');
       scope.done();
