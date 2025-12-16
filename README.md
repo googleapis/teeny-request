@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/googleapis/teeny-request.svg?branch=master)](https://travis-ci.org/googleapis/teeny-request)
 
-**_THIS REPOSITORY AND PACKAGE WILL BE DEPRECATED IN JULY 2024. RELEVANT FUNCTIONALITIES HAVE BEEN MOVED TO [GOOGLEAPIS/GAXIOS](https://github.com/googleapis/gaxios)_**
+  **_THIS REPOSITORY AND PACKAGE HAVE BEEN MIGRATED TO GOOGLEAPIS/GOOGLE-CLOUD-NODE-CORE_**
 
 # teeny-request 
 
